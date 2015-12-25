@@ -24,6 +24,7 @@ export class BaseConfig {
       signupRoute: '/signup',
       tokenRoot: false,
       tokenName: 'token',
+      userIdName: false,
       tokenPrefix: 'aurelia',
       unlinkUrl: '/auth/unlink/',
       unlinkMethod: 'get',

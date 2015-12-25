@@ -21,9 +21,6 @@ export class AuthService {
   }
 
   updateMe(body, criteria=null) {
-    if (typeof criteria === 'string' || typeof criteria === 'number') {
-      criteria = {id: criteria};
-    }   
     return this.rest.update(this.auth.getProfileUrl(), criteria, body);
   }
 
@@ -50,6 +47,7 @@ export class AuthService {
     return this.rest.post(signupUrl, content)
       .then(response => {
         if (this.config.loginOnSignup) {
+          this.auth.setUserIdFromResponse(response);
           this.auth.setTokenFromResponse(response);
         } else if (this.config.signupRedirect) {
           window.location.href = this.config.signupRedirect;
@@ -73,6 +71,7 @@ export class AuthService {
 
     return this.rest.post(loginUrl, content)
       .then(response => {
+        this.auth.setUserIdFromResponse(response);
         this.auth.setTokenFromResponse(response);
 
         return response;

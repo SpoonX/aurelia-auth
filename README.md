@@ -253,11 +253,12 @@ Via the above mentioned configuration virtually all aspects of the authenticatio
   signupRedirect: '/login',
   loginUrl: '/auth/login',
   signupUrl: '/auth/signup',
-  profileUrl: '/auth/me',
+  profileUrl: '/auth/me',  // also accepts eg '/auth/:userid'. the identifier ':userid' will be replaced by the current userId is known 
   loginRoute: '/login',
   signupRoute: '/signup',
   tokenRoot: false,
   tokenName: 'token',
+  userIdName: false,  // if userIdName is set, the userId will be extracted from the login response body json (using tokenRoot if applicable) with the given userIdName as key
   tokenPrefix: 'aurelia',
   unlinkUrl: '/auth/unlink/',
   unlinkMethod: 'get',
