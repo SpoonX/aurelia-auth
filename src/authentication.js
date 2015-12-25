@@ -9,6 +9,8 @@ export class Authentication {
     this.storage   = storage;
     this.config    = config.current;
     this.tokenName = this.config.tokenPrefix ? this.config.tokenPrefix + '_' + this.config.tokenName : this.config.tokenName;
+    if (this.config.userIdName)
+      this.userIdName = this.config.tokenPrefix ? this.config.tokenPrefix + '_' + this.config.userIdName : this.config.userIdName;
   }
 
   getLoginRoute() {
@@ -28,11 +30,18 @@ export class Authentication {
   }
 
   getProfileUrl() {
-    return this.config.baseUrl ? authUtils.joinUrl(this.config.baseUrl, this.config.profileUrl) : this.config.profileUrl;
+    let profileUrl = this.config.profileUrl.replace(/:userid/i,this.getUserId());
+    return this.config.baseUrl ? authUtils.joinUrl(this.config.baseUrl, profileUrl) : profileUrl;
   }
 
   getToken() {
     return this.storage.get(this.tokenName);
+  }
+
+  getUserId() {
+    if (this.config.userIdName)
+      return this.storage.get(this.userIdName);
+    throw Error('UserId not set')
   }
 
   getPayload() {
@@ -79,6 +88,29 @@ export class Authentication {
 
   removeToken() {
     this.storage.remove(this.tokenName);
+    if (this.config.userIdName)
+      this.storage.remove(this.userIdName);
+  }
+
+  setUserIdFromResponse(response) {
+    if (!this.config.userIdName)
+        return;
+
+    let userIdName   = this.userIdName;
+    let userId;
+
+
+    if (response) {
+      userId = this.config.tokenRoot && response[this.config.tokenRoot] ? response[this.config.tokenRoot][this.config.userIdName] : response[this.config.userIdName];
+    }
+
+    if (!userId) {
+      let userIdPath = this.config.tokenRoot ? this.config.tokenRoot + '.' + this.config.userIdName : this.config.userIdName;
+
+      throw new Error('Expecting a userId named "' + userIdPath + '" but instead got: ' + JSON.stringify(response));
+    }
+
+    this.storage.set(userIdName, userId);
   }
 
   isAuthenticated() {
