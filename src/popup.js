@@ -55,13 +55,13 @@ export class Popup {
         }
       });
 
-      popupWindow.addEventListener('exit', () => {
+      self.popupWindow.addEventListener('exit', () => {
         reject({
           data: 'Provider Popup was closed'
         });
       });
 
-      popupWindow.addEventListener('loaderror', () => {
+      self.popupWindow.addEventListener('loaderror', () => {
         deferred.reject({
           data: 'Authorization Failed'
         });
