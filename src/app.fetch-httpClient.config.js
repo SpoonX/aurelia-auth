@@ -36,7 +36,7 @@ export class FetchConfig {
           return request;
         }
 
-        let token     = auth.getToken();
+        let token = auth.getToken();
 
         if (config.authHeader && config.authToken) {
           token = `${config.authToken} ${token}`;
