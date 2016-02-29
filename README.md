@@ -249,7 +249,8 @@ Via the above mentioned configuration virtually all aspects of the authenticatio
 ```js
 //If not using aurelia-api (backwards compatability):
 
-  // 
+  // Whether to enable the fetch interceptor which automatically adds the authentication headers
+  // (or not... e.g. if using a session based API or you want to override the default behaviour)
   httpInterceptor: true,
   // The base url used for all authentication related requests
   baseUrl: '/',
