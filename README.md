@@ -248,29 +248,53 @@ Via the above mentioned configuration virtually all aspects of the authenticatio
 
 ```js
   httpInterceptor: true,
+  // If using aurelia-api: This is the endpoint used for authentication related requests
   endpoint: null,
+  // If using aurelia-api and authenticated: the token will be added to the header of all requests to these endpoints
   configureEndpoints: null,
+  // Whether a user is authenticated immedately following signup
   loginOnSignup: true,
+  // ????????????????????????????? The base url used in all authentication requests
   baseUrl: '/',
+  // The SPA url to which the user is redirected after a successful login
   loginRedirect: '/#customer',
+  // The SPA url to which the user is redirected after a successful logout
   logoutRedirect: '/',
+  // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup
   signupRedirect: '/login',
+  // The API endpoint to which login requests are sent
   loginUrl: '/auth/login',
+  // The API endpoint used to add new users
   signupUrl: '/auth/signup',
+  // The API endpoint used in profile requests (`find` and `update`)
   profileUrl: '/auth/me',
+  // The SPA route used when a user is not authenticated and tries to access an SPA page that requires authentication
   loginRoute: '/login',
+  // ????????????????????????????? THIS SEEMS TO PROVIDE NO FUNCTIONAL USE?
   signupRoute: '/signup',
+  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value and why have a root at all?
   tokenRoot: false,
+  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value?
   tokenName: 'token',
+  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value?
   tokenPrefix: 'aurelia',
+  // The API endpoint used in oAuth unlink requests
   unlinkUrl: '/auth/unlink/',
+  // The HTTP method used in unlink requests (Options: 'get' or 'post')
   unlinkMethod: 'get',
+  // The header property used to contain the authToken in the header of API requests that require authentication
   authHeader: 'Authorization',
+  // The the property from which to get the authentication token after a successful login or signup
   responseTokenProp: 'access_token',
+  // The token name used in the header of API requests that require authentication
   authToken: 'Bearer',
+  // ?????????????????????????????
   withCredentials: true,
+  // Controls how the popup is shown on different devices (Options: 'browser' or 'mobile')
   platform: 'browser',
+  // Determines the window propertyname upon which aurelia-auth data is stored (Default: `window.localStorage`)
   storage: 'localStorage',
+  
   providers: {
     google: {
       name: 'google',
