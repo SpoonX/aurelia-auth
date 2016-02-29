@@ -247,14 +247,6 @@ In the above example the customer route is only available for authenticated user
 Via the above mentioned configuration virtually all aspects of the authentication process can be tweaked:
 
 ```js
-//If not using aurelia-api (backwards compatability):
-
-  // Whether to enable the fetch interceptor which automatically adds the authentication headers
-  // (or not... e.g. if using a session based API or you want to override the default behaviour)
-  httpInterceptor: true,
-  // The base url used for all authentication related requests
-  baseUrl: '/',
-
 
 // If using aurelia-api: 
 
@@ -307,6 +299,11 @@ Via the above mentioned configuration virtually all aspects of the authenticatio
 
 // Miscellaneous Options
 
+  // Whether to enable the fetch interceptor which automatically adds the authentication headers
+  // (or not... e.g. if using a session based API or you want to override the default behaviour)
+  httpInterceptor: true,
+  // The base url used for all authentication related requests (This appends to the httpClient/endpoint base url, it does not override it)
+  baseUrl: '/',
   // For OAuth only: Tell the API whether or not to include token cookies in the response (for session based APIs)
   withCredentials: true,
   // Controls how the popup is shown for different devices (Options: 'browser' or 'mobile')
