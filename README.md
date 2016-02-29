@@ -244,141 +244,162 @@ In the above example the customer route is only available for authenticated user
 
 ## Full configuration options.
 
-Via the above mentioned configuration virtually all aspects of the authentication process be tweaked:
+Via the above mentioned configuration virtually all aspects of the authentication process can be tweaked:
 
 ```js
+//If not using aurelia-api (backwards compatability):
+
+  // 
   httpInterceptor: true,
-  // If using aurelia-api: This is the endpoint used for authentication related requests
-  endpoint: null,
-  // If using aurelia-api and authenticated: the token will be added to the header of all requests to these endpoints
-  configureEndpoints: null,
-  // Whether a user is authenticated immedately following signup
-  loginOnSignup: true,
-  // ????????????????????????????? The base url used in all authentication requests
+  // The base url used for all authentication related requests
   baseUrl: '/',
+
+
+// If using aurelia-api: 
+
+  // This is the endpoint used for any requests made in relation to authentication (login, logout, etc.)
+  endpoint: null,
+  // When authenticated, these endpoints will have the token added to the header of any requests (for authorization)
+  configureEndpoints: null,
+
+// SPA related options
+
   // The SPA url to which the user is redirected after a successful login
   loginRedirect: '/#customer',
   // The SPA url to which the user is redirected after a successful logout
   logoutRedirect: '/',
-  // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup
+  // The SPA route used when an unauthenticated user tries to access an SPA page that requires authentication
+  loginRoute: '/login',
+  // Whether or not an authentication token is provided in the response to a successful signup
+  loginOnSignup: true,
+  // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup (else loginRedirect is used)
   signupRedirect: '/login',
+
+// API related options
+
   // The API endpoint to which login requests are sent
   loginUrl: '/auth/login',
-  // The API endpoint used to add new users
+  // The API endpoint to which signup requests are sent
   signupUrl: '/auth/signup',
-  // The API endpoint used in profile requests (`find` and `update`)
+  // The API endpoint used in profile requests (inc. `find/get` and `update`)
   profileUrl: '/auth/me',
-  // The SPA route used when a user is not authenticated and tries to access an SPA page that requires authentication
-  loginRoute: '/login',
-  // ????????????????????????????? THIS SEEMS TO PROVIDE NO FUNCTIONAL USE?
-  signupRoute: '/signup',
-  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value and why have a root at all?
-  tokenRoot: false,
-  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value?
-  tokenName: 'token',
-  // ????????????????????????????? THIS IS INTERNAL: why might a user want to change this value?
-  tokenPrefix: 'aurelia',
-  // The API endpoint used in oAuth unlink requests
+  // The API endpoint used with oAuth to unlink authentication
   unlinkUrl: '/auth/unlink/',
-  // The HTTP method used in unlink requests (Options: 'get' or 'post')
+  // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
   unlinkMethod: 'get',
-  // The header property used to contain the authToken in the header of API requests that require authentication
-  authHeader: 'Authorization',
+
+// Token Related options
+
   // The the property from which to get the authentication token after a successful login or signup
   responseTokenProp: 'access_token',
+  
+  // If the property defined by `responseTokenProp` is an object:
+    //This is the property from which to get the token `{ "responseTokenProp": { "tokenName" : '...' } }`
+    tokenName: 'token',
+    // This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
+    tokenRoot: false,
+  
+  // The header property used to contain the authToken in the header of API requests that require authentication
+  authHeader: 'Authorization',
   // The token name used in the header of API requests that require authentication
   authToken: 'Bearer',
-  // ?????????????????????????????
+
+// Miscellaneous Options
+
+  // For OAuth only: Tell the API whether or not to include token cookies in the response (for session based APIs)
   withCredentials: true,
-  // Controls how the popup is shown on different devices (Options: 'browser' or 'mobile')
+  // Controls how the popup is shown for different devices (Options: 'browser' or 'mobile')
   platform: 'browser',
-  // Determines the window propertyname upon which aurelia-auth data is stored (Default: `window.localStorage`)
+  // Determines the `window` property name upon which aurelia-auth data is stored (Default: `window.localStorage`)
   storage: 'localStorage',
-  
-  providers: {
-    google: {
-      name: 'google',
-      url: '/auth/google',
-      authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-      redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
-      scope: ['profile', 'email'],
-      scopePrefix: 'openid',
-      scopeDelimiter: ' ',
-      requiredUrlParams: ['scope'],
-      optionalUrlParams: ['display'],
-      display: 'popup',
-      type: '2.0',
-      /*clientId: '239531826023-ibk10mb9p7ull54j55a61og5lvnjrff6.apps.googleusercontent.com',*/
-      popupOptions: { width: 452, height: 633 }
+  // Prepended to the `tokenName` when kept in storage (nothing to do with)
+  tokenPrefix: 'aurelia', 
+
+//OAuth provider specific related configuration
+providers: {
+  google: {
+    name: 'google',
+    url: '/auth/google',
+    authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    scope: ['profile', 'email'],
+    scopePrefix: 'openid',
+    scopeDelimiter: ' ',
+    requiredUrlParams: ['scope'],
+    optionalUrlParams: ['display'],
+    display: 'popup',
+    type: '2.0',
+    /*clientId: '239531826023-ibk10mb9p7ull54j55a61og5lvnjrff6.apps.googleusercontent.com',*/
+    popupOptions: { width: 452, height: 633 }
+  },
+  facebook: {
+    name: 'facebook',
+    url: '/auth/facebook',
+    authorizationEndpoint: 'https://www.facebook.com/v2.3/dialog/oauth',
+    redirectUri: window.location.origin + '/' || window.location.protocol + '//' + window.location.host + '/',
+    scope: ['email'],
+    scopeDelimiter: ',',
+    nonce: function() {
+      return Math.random();
     },
-    facebook: {
-      name: 'facebook',
-      url: '/auth/facebook',
-      authorizationEndpoint: 'https://www.facebook.com/v2.3/dialog/oauth',
-      redirectUri: window.location.origin + '/' || window.location.protocol + '//' + window.location.host + '/',
-      scope: ['email'],
-      scopeDelimiter: ',',
-      nonce: function() {
-        return Math.random();
-      },
-      requiredUrlParams: ['nonce','display', 'scope'],
-      display: 'popup',
-      type: '2.0',
-      popupOptions: { width: 580, height: 400 }
-    },
-    linkedin: {
-      name: 'linkedin',
-      url: '/auth/linkedin',
-      authorizationEndpoint: 'https://www.linkedin.com/uas/oauth2/authorization',
-      redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
-      requiredUrlParams: ['state'],
-      scope: ['r_emailaddress'],
-      scopeDelimiter: ' ',
-      state: 'STATE',
-      type: '2.0',
-      popupOptions: { width: 527, height: 582 }
-    },
-    github: {
-      name: 'github',
-      url: '/auth/github',
-      authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-      redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
-      optionalUrlParams: ['scope'],
-      scope: ['user:email'],
-      scopeDelimiter: ' ',
-      type: '2.0',
-      popupOptions: { width: 1020, height: 618 }
-    },
-    yahoo: {
-      name: 'yahoo',
-      url: '/auth/yahoo',
-      authorizationEndpoint: 'https://api.login.yahoo.com/oauth2/request_auth',
-      redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
-      scope: [],
-      scopeDelimiter: ',',
-      type: '2.0',
-      popupOptions: { width: 559, height: 519 }
-    },
-    twitter: {
-      name: 'twitter',
-      url: '/auth/twitter',
-      authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
-      type: '1.0',
-      popupOptions: { width: 495, height: 645 }
-    },
-    live: {
-      name: 'live',
-      url: '/auth/live',
-      authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
-      redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
-      scope: ['wl.emails'],
-      scopeDelimiter: ' ',
-      requiredUrlParams: ['display', 'scope'],
-      display: 'popup',
-      type: '2.0',
-      popupOptions: { width: 500, height: 560 }
-    }
+    requiredUrlParams: ['nonce','display', 'scope'],
+    display: 'popup',
+    type: '2.0',
+    popupOptions: { width: 580, height: 400 }
+  },
+  linkedin: {
+    name: 'linkedin',
+    url: '/auth/linkedin',
+    authorizationEndpoint: 'https://www.linkedin.com/uas/oauth2/authorization',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    requiredUrlParams: ['state'],
+    scope: ['r_emailaddress'],
+    scopeDelimiter: ' ',
+    state: 'STATE',
+    type: '2.0',
+    popupOptions: { width: 527, height: 582 }
+  },
+  github: {
+    name: 'github',
+    url: '/auth/github',
+    authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    optionalUrlParams: ['scope'],
+    scope: ['user:email'],
+    scopeDelimiter: ' ',
+    type: '2.0',
+    popupOptions: { width: 1020, height: 618 }
+  },
+  yahoo: {
+    name: 'yahoo',
+    url: '/auth/yahoo',
+    authorizationEndpoint: 'https://api.login.yahoo.com/oauth2/request_auth',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    scope: [],
+    scopeDelimiter: ',',
+    type: '2.0',
+    popupOptions: { width: 559, height: 519 }
+  },
+  twitter: {
+    name: 'twitter',
+    url: '/auth/twitter',
+    authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
+    type: '1.0',
+    popupOptions: { width: 495, height: 645 }
+  },
+  live: {
+    name: 'live',
+    url: '/auth/live',
+    authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    scope: ['wl.emails'],
+    scopeDelimiter: ' ',
+    requiredUrlParams: ['display', 'scope'],
+    display: 'popup',
+    type: '2.0',
+    popupOptions: { width: 500, height: 560 }
   }
+}
 ```
 
 More non Aurelia specific details can be found on the [Sattelizer Github page](https://github.com/sahat/satellizer/).
