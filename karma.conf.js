@@ -6,28 +6,15 @@ module.exports = function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks         : ['jspm', 'jasmine'],
-    jspm               : {
+    frameworks: ['jspm', 'jasmine'],
+
+    jspm: {
       // Edit this to your needs
-      loadFiles: ['test/setup.js', 'src/**/*.js', 'test/**/*.js'],
-      paths    : {
-        '*': '*.js'
-      }
-
-    },
-    'babelPreprocessor': {
-      options: {
-        sourceMap: 'inline',
-        modules  : 'system',
-        moduleIds: false,
-        optional : [
-          "es7.decorators",
-          "es7.classProperties"
-        ]
-      }
+      loadFiles: ['test/setup.js', 'test/**/*.js'],
+      serveFiles: ['src/**/*.js'],
     },
 
-    // list of files / patterns to load in the browser.
+    // list of files / patterns to load in the browser
     files: [],
 
     // list of files to exclude
@@ -35,7 +22,21 @@ module.exports = function (config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {},
+    preprocessors: {
+      'test/**/*.js': ['babel'],
+      'src/**/*.js': ['babel']
+    },
+    'babelPreprocessor': {
+      options: {
+        sourceMap: 'inline',
+        presets: [ 'es2015-loose', 'stage-1'],
+        plugins: [
+          'syntax-flow',
+          'transform-decorators-legacy',
+          'transform-flow-strip-types'
+        ]
+      }
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'

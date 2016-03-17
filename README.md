@@ -6,6 +6,7 @@
 > Makes setting up authentication for your Aurelia app simple.
 
 ## What is aurelia-auth?
+
 This is a largely refactored module based on [paul van bladel's aurelia-auth](https://github.com/paulvanbladel/aurelia-auth/).
 
 aurelia-auth is a token-based authentication plugin for [Aurelia](http://aurelia.io/) with support for popular social authentication providers (Google, Twitter, Facebook, LinkedIn, Windows Live, FourSquare, Yahoo, Github, Instagram) and a local stragegy, i.e. simple username / email and password.
@@ -25,29 +26,34 @@ Spoonx/aurelia-auth makes use of [aurelia-api](https://github.com/SpoonX/aurelia
 ![Authentication header](./pictures/authHeader.png)
 
 ## Installation
+
 We assume that you know about ([NodeJs](https://nodejs.org/), [Gulp](http://gulpjs.com/)) and [Aurelia](http://aurelia.io/).
 Since aurelia-auth is an [Aurelia plugin](https://github.com/aurelia/skeleton-plugin), we also assume that you have your [Aurelia](http://aurelia.io/) project up and running.
 
-```
+```shell
 jspm install github:spoonx/aurelia-auth
 ```
 
 ## How to use aurelia-auth?
+
 aurelia-auth does not contain any UI widgets. It's conceived as a simple service with following interface:
+
 ```javascript
 login(email, password)
 logout(redirectUri)
 authenticate(provider, redirect, userData)
 signup(displayName, email, password)
 getMe([criteria])
-updateMe(data[,criteria]) 
+updateMe(data[,criteria])
 isAuthenticated()
 getTokenPayload()
 unlink(provider)
 ```
+
 Login is used for the local authentication strategy (email + password). Authenticate is for social media authentication. Authenticate is also used for linking a social media account to an existing account.
 
 ### Add an aurelia-auth security configuration file
+
 Add an javascript file to your project where you will store the aurelia-auth  security configuration data. Call it for example authConfig.js.
 Since this file is available via the browser, it should never contain sensitive data. Note that for OAuth the clientId is non sensitive. The client secret is sensitive data and should be only available server side. The aurelia-auth config file is compatible with the original Satellizer config file, easing the migration of AngularJs projects to Aurelia.
 
@@ -99,8 +105,8 @@ else {
 }
 
 export default config;
-
 ```
+
 The above configuration file can cope with a development and production version (not mandatory of course). The strategy is that when your run on localhost, the development configuration file is used, otherwise the production configuration file is taken.
 
 ### Update the aurelia configuration file
@@ -131,14 +137,14 @@ export function configure(aurelia) {
 
     aurelia.start().then(a => a.setRoot());
 }
-
 ```
 
-### Provide a UI for a login, signup and profile.
+### Provide a UI for a login, signup and profile
 
 See aurelia-auth-samples for more details.
 
 Button actions are passed to the corresponding view model via a simple click.delegate:
+
 ```html
 <button class="btn btn-block btn-google-plus" click.delegate="authenticate('google')">
     <span class="ion-social-googleplus"></span>Sign in with Google
@@ -146,6 +152,7 @@ Button actions are passed to the corresponding view model via a simple click.del
 ```
 
 The login view model will speak directly with the aurelia-auth service, which is made available via constructor injection.
+
 ```js
 import {AuthService} from 'spoonx/aurelia-auth';
 import {inject} from 'aurelia-framework';
@@ -180,6 +187,7 @@ export class Login {
 ```
 
 On the profile page, social media accounts can be linked and unlinked. For a nice UI experience, use  if.bind for either showing the link or unlink button:
+
 ```html
 <button class="btn btn-sm btn-danger" if.bind="profile.facebook" click.delegate="unlink('facebook')">
     <i class="ion-social-facebook"></i> Unlink Facebook Account
@@ -188,6 +196,7 @@ On the profile page, social media accounts can be linked and unlinked. For a nic
     <i class="ion-social-facebook"></i> Link Facebook Account
 </button>
 ```
+
 ### Making the Aurelia Router authentication aware
 
 The logout and profile links are only shown when the user is authenticated, whereas the login link is only visible when the user is not authenticated.
@@ -216,6 +225,7 @@ The logout and profile links are only shown when the user is authenticated, wher
     </ul>
 </div>
 ```
+
 Menu items visibility can also be linked with the authFilter to the isAuthenticated value.
 
 In the router config function, you can specifify an auth property in the routing map indicating wether or not the user needs to be authenticated in order to access the route:
@@ -240,9 +250,10 @@ export class App {
     };
 }
 ```
+
 In the above example the customer route is only available for authenticated users.
 
-## Full configuration options.
+## Full configuration options
 
 Via the above mentioned configuration virtually all aspects of the authentication process can be tweaked:
 

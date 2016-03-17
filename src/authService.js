@@ -3,7 +3,7 @@ import {Authentication} from './authentication';
 import {BaseConfig} from './baseConfig';
 import {OAuth1} from './oAuth1';
 import {OAuth2} from './oAuth2';
-import authUtils from './authUtils';
+import {authUtils} from './authUtils';
 
 @inject(Authentication, OAuth1, OAuth2, BaseConfig)
 export class AuthService {

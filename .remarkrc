@@ -1,0 +1,24 @@
+{
+  "output": true,
+  "plugins": {
+    "lint": {
+      "maximum-line-length": false,
+      "heading-style": "atx",
+      "no-duplicate-headings": false,
+      "no-undefined-references": false,
+      "no-shortcut-reference-link": false,
+      "no-heading-punctuation": ".,;:!",
+      "list-item-indent": false
+    }
+  },
+  "settings": {
+    "gfm": true,
+    "bullet": "*",
+    "closeAtx": false,
+    "fences": true,
+    "listItemIndent": "1",
+    "rule": "-",
+    "ruleRepetition": 10,
+    "ruleSpaces": false
+  }
+}

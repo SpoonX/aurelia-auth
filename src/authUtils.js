@@ -158,4 +158,4 @@ let authUtils = {
 
 };
 
-export default authUtils;
+export {authUtils};
