@@ -1,5 +1,5 @@
 import {Container} from 'aurelia-dependency-injection';
-import {FetchConfig} from '../src/index';
+import {FetchConfig} from '../src/aurelia-auth';
 import {HttpClient} from 'aurelia-fetch-client';
 import {Config, Rest} from 'spoonx/aurelia-api';
 
