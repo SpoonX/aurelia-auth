@@ -15,21 +15,19 @@ var vinylPaths = require('vinyl-paths');
 // merged output file name. a folder of paths.packageName is temporarly created in build-dts
 var jsName = paths.packageName + '.js';
 
-
 gulp.task('build-dts', function() {
   var importsToAdd = []; // stores extracted imports
 
   return gulp.src(paths.tsSource)
     .pipe(tools.sortFiles())
     .pipe(through2.obj(function(file, enc, callback) {  // extract all imports to importsToAdd
-      file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
-      this.push(file);
+      if (file) {
+        file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
+        this.push(file);
+      }
       return callback();
     }))
     .pipe(concat(jsName)) // concat all selected files to jsName (now without their imports)
-    .pipe(insert.transform(function(contents) { // re-add extracted imports on top
-      return tools.createImportBlock(importsToAdd) + contents;
-    }))
     .pipe(to5(assign({}, compilerOptions.dts()))); // compile to d.ts from file jsName. d.ts file is in folder paths.packageName
 });
 

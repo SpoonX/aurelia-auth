@@ -1,23 +1,7 @@
 declare module 'aurelia-authentication' {
-  import {
-    inject
-  } from 'aurelia-dependency-injection';
-  import {
-    HttpClient
-  } from 'aurelia-fetch-client';
-  import {
-    Config,
-    Rest
-  } from 'spoonx/aurelia-api';
-  import {
-    Redirect
-  } from 'aurelia-router';
   export class AuthFilterValueConverter {
     toView(routes: any, isAuthenticated: any): any;
   }
-  export {
-    authUtils
-  };
   export class BaseConfig {
     configure(incomingConfig: any): any;
     current: any;

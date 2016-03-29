@@ -12,7 +12,8 @@ module.exports = {
   source: appRoot + '**/*.js',
   tsSource: [
     appRoot + '**/*.js',          // list files to parse for d.ts
-   '!' + appRoot + entryFileName  // exclude entry file
+   '!' + appRoot + entryFileName, // exclude entry file
+   '!**/authUtils.js'  			  // exclude utility functions
   ],
   html: appRoot + '**/*.html',
   style: 'styles/**/*.css',
