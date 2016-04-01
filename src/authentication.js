@@ -74,11 +74,15 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response[this.config.tokenRoot] ? response[this.config.tokenRoot][this.config.tokenName] : response[this.config.tokenName];
+      token = this.config.tokenRoot && response[this.config.tokenRoot]
+        ? response[this.config.tokenRoot][this.config.tokenName]
+        : response[this.config.tokenName];
     }
 
     if (!token) {
-      let tokenPath = this.config.tokenRoot ? this.config.tokenRoot + '.' + this.config.tokenName : this.config.tokenName;
+      let tokenPath = this.config.tokenRoot
+        ? this.config.tokenRoot + '.' + this.config.tokenName
+        : this.config.tokenName;
 
       throw new Error('Expecting a token named "' + tokenPath + '" but instead got: ' + JSON.stringify(response));
     }
@@ -94,8 +98,7 @@ export class Authentication {
 
   setRefreshTokenFromResponse(response) {
     let refreshTokenName = this.refreshTokenName;
-    let refreshToken     = response && response.refresh_token;
-    let refreshTokenPath;
+    let refreshToken     = response && response[this.config.refreshTokenProp];
     let token;
 
     if (refreshToken) {
@@ -112,7 +115,7 @@ export class Authentication {
         : response[this.config.refreshTokenName];
     }
     if (!token) {
-      refreshTokenPath = this.config.refreshTokenRoot
+      let refreshTokenPath = this.config.refreshTokenRoot
         ? this.config.refreshTokenRoot + '.' + this.config.refreshTokenName
         : this.config.refreshTokenName;
 
