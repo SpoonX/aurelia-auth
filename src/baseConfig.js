@@ -64,17 +64,17 @@ export class BaseConfig {
       // The token name used in the header of API requests that require authentication
       authToken: 'Bearer',
       // The the property from which to get the authentication token after a successful login or signup
-      responseTokenProp: 'access_token',
-      // Prepended to the `tokenName` when kept in storage (nothing to do with access token responses)
-      tokenPrefix: 'aurelia',
+      accessTokenProp: 'access_token',
+      // Prepended to the `accessTokenName` when kept in storage (nothing to do with access token responses)
+      accessTokenPrefix: 'aurelia',
 
-      // If the property defined by `responseTokenProp` is an object:
+      // If the property defined by `accessTokenProp` is an object:
       // ------------------------------------------------------------
 
-      //This is the property from which to get the token `{ "responseTokenProp": { "tokenName" : '...' } }`
-      tokenName: 'token',
-      // This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
-      tokenRoot: false,
+      //This is the property from which to get the token `{ "accessTokenProp": { "accessTokenName" : '...' } }`
+      accessTokenName: 'token',
+      // This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
+      accessTokenRoot: false,
 
 
       // Refresh Token Options
