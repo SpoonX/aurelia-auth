@@ -333,13 +333,15 @@ autoUpdateToken: true,
 clientId: false,
 // The property name used when storing the refresh token locally
 refreshTokenStorage: 'aurelia_refresh_token',
+// The the property from which to get the refresh token after a successful token refresh
+refreshTokenProp: 'refresh_token',
       
-// If `refresh_token` is an object:
-// ------------------------------------------------------------
+// If the property defined by `refreshTokenProp` is an object:
+// -----------------------------------------------------------
 
-// This is the property from which to get the token `{ "refresh_token": { "refreshTokenName" : '...' } }`
-refreshTokenName: 'refresh_token',
-// This allows the refresh token to be a further object deeper `{ "refresh_token": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
+// This is the property from which to get the token `{ "refreshTokenProp": { "refreshTokenName" : '...' } }`
+refreshTokenName: 'token',
+// This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
 refreshTokenRoot: false,
 
 

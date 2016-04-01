@@ -88,7 +88,7 @@ export class Authentication {
   }
 
   setRefreshTokenFromResponse(response) {
-    let refreshToken = response && response.refresh_token;
+    let refreshToken = response && response[this.config.refreshTokenProp];
     let token;
 
     if (refreshToken) {
