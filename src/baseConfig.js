@@ -55,21 +55,6 @@ export class BaseConfig {
       // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
       unlinkMethod: 'get',
 
-      // Refresh Token Options
-      // =====================
-
-      // Option to turn refresh tokens On/Off
-      useRefreshToken: false,
-      // The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
-      autoUpdateToken: true,
-      // This allows the refresh token to be a further object deeper `{ "responseTokenProp": { "refreshTokenRoot" : { "tokenName" : '...' } } }`
-      refreshTokenRoot: false,
-      // This is the property from which to get the token `{ "responseTokenProp": { "refreshTokenName" : '...' } }`
-      refreshTokenName: 'refresh_token',
-      // Prepended to the `refreshTokenName` when kept in storage (nothing to do with)
-      refreshTokenPrefix: 'aurelia',
-      // Oauth Client Id
-      clientId: false,
 
       // Token Related options
       // =====================
@@ -80,6 +65,8 @@ export class BaseConfig {
       authToken: 'Bearer',
       // The the property from which to get the authentication token after a successful login or signup
       responseTokenProp: 'access_token',
+      // Prepended to the `tokenName` when kept in storage (nothing to do with access token responses)
+      tokenPrefix: 'aurelia',
 
       // If the property defined by `responseTokenProp` is an object:
       // ------------------------------------------------------------
@@ -88,6 +75,29 @@ export class BaseConfig {
       tokenName: 'token',
       // This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
       tokenRoot: false,
+
+
+      // Refresh Token Options
+      // =====================
+
+      // Option to turn refresh tokens On/Off
+      useRefreshToken: false,
+      // The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
+      autoUpdateToken: true,
+      // The the property from which to get the refresh token after a successful token refresh
+      refreshTokenProp: 'refresh_token',
+      // Prepended to the `refreshTokenName` when kept in storage (nothing to do with refresh token responses)
+      refreshTokenPrefix: 'aurelia',
+      // Oauth Client Id
+      clientId: false,
+
+      // If the property defined by `refreshTokenProp` is an object:
+      // ------------------------------------------------------------
+
+      // This is the property from which to get the token `{ "refreshTokenProp": { "refreshTokenName" : '...' } }`
+      refreshTokenName: 'token',
+      // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
+      refreshTokenRoot: false,
 
 
       // Miscellaneous Options
@@ -100,10 +110,8 @@ export class BaseConfig {
       withCredentials: true,
       // Controls how the popup is shown for different devices (Options: 'browser' or 'mobile')
       platform: 'browser',
-      // Determines the `window` property name upon which aurelia-auth data is stored (Default: `window.localStorage`)
+      // Determines the `window` property name upon which aurelia-authentication data is stored (Default: `window.localStorage`)
       storage: 'localStorage',
-      // Prepended to the `tokenName` when kept in storage (nothing to do with)
-      tokenPrefix: 'aurelia',
 
 
       //OAuth provider specific related configuration
