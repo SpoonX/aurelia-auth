@@ -15,7 +15,7 @@ export class Authentication {
   }
 
   get tokenName() {
-    return this.config.tokenPrefix ? this.config.tokenPrefix + '_' + this.config.tokenName : this.config.tokenName;
+    return this.config.accessTokenPrefix ? this.config.accessTokenPrefix + '_' + this.config.accessTokenName : this.config.accessTokenName;
   }
 
   getLoginRoute() {
@@ -61,8 +61,8 @@ export class Authentication {
   }
 
   setTokenFromResponse(response, redirect) {
-    let tokenName   = this.tokenName;
-    let accessToken = response && response[this.config.responseTokenProp];
+    let accessTokenName = this.accessTokenName;
+    let accessToken     = response && response[this.config.accessTokenProp];
     let token;
 
     if (accessToken) {
@@ -74,16 +74,20 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response[this.config.tokenRoot] ? response[this.config.tokenRoot][this.config.tokenName] : response[this.config.tokenName];
+      token = this.config.accessTokenRoot && response[this.config.accessTokenRoot]
+        ? response[this.config.accessTokenRoot][this.config.accessTokenName]
+        : response[this.config.accessTokenName];
     }
 
     if (!token) {
-      let tokenPath = this.config.tokenRoot ? this.config.tokenRoot + '.' + this.config.tokenName : this.config.tokenName;
+      let accessTokenPath = this.config.accessTokenRoot
+        ? this.config.accessTokenRoot + '.' + this.config.accessTokenName
+        : this.config.accessTokenName;
 
-      throw new Error('Expecting a token named "' + tokenPath + '" but instead got: ' + JSON.stringify(response));
+      throw new Error('Expecting a token named "' + accessTokenPath + '" but instead got: ' + JSON.stringify(response));
     }
 
-    this.storage.set(tokenName, token);
+    this.storage.set(accessTokenName, token);
 
     if (this.config.loginRedirect && !redirect) {
       window.location.href = this.config.loginRedirect;
@@ -94,8 +98,7 @@ export class Authentication {
 
   setRefreshTokenFromResponse(response) {
     let refreshTokenName = this.refreshTokenName;
-    let refreshToken     = response && response.refresh_token;
-    let refreshTokenPath;
+    let refreshToken     = response && response[this.config.refreshTokenProp];
     let token;
 
     if (refreshToken) {
@@ -112,7 +115,7 @@ export class Authentication {
         : response[this.config.refreshTokenName];
     }
     if (!token) {
-      refreshTokenPath = this.config.refreshTokenRoot
+      let refreshTokenPath = this.config.refreshTokenRoot
         ? this.config.refreshTokenRoot + '.' + this.config.refreshTokenName
         : this.config.refreshTokenName;
 

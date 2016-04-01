@@ -300,21 +300,6 @@ unlinkUrl: '/auth/unlink/',
 // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
 unlinkMethod: 'get',
 
-// Refresh Token Options
-// =====================
-
-// Option to turn refresh tokens On/Off
-useRefreshToken: false,
-// The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
-autoUpdateToken: true,
-// This allows the refresh token to be a further object deeper `{ "responseTokenProp": { "refreshTokenRoot" : { "tokenName" : '...' } } }`
-refreshTokenRoot: false,
-// This is the property from which to get the token `{ "responseTokenProp": { "refreshTokenName" : '...' } }`
-refreshTokenName: 'refresh_token',
-// Prepended to the `refreshTokenName` when kept in storage (nothing to do with)
-refreshTokenPrefix: 'aurelia',
-// Oauth Client Id
-clientId: false,
 
 // Token Related options
 // =====================
@@ -324,15 +309,40 @@ authHeader: 'Authorization',
 // The token name used in the header of API requests that require authentication
 authToken: 'Bearer',
 // The the property from which to get the authentication token after a successful login or signup
-responseTokenProp: 'access_token',
+accessTokenProp: 'access_token',
+// Prepended to the `accessTokenName` when kept in storage (nothing to do with access token responses)
+accessTokenPrefix: 'aurelia',
 
-// If the property defined by `responseTokenProp` is an object:
+// If the property defined by `accessTokenProp` is an object:
 // ------------------------------------------------------------
 
-//This is the property from which to get the token `{ "responseTokenProp": { "tokenName" : '...' } }`
-tokenName: 'token',
-// This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
-tokenRoot: false,
+//This is the property from which to get the token `{ "accessTokenProp": { "accessTokenName" : '...' } }`
+accessTokenName: 'token',
+// This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
+accessTokenRoot: false,
+
+
+// Refresh Token Options
+// =====================
+
+// Option to turn refresh tokens On/Off
+useRefreshToken: false,
+// The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
+autoUpdateToken: true,
+// The the property from which to get the refresh token after a successful token refresh
+refreshTokenProp: 'refresh_token',
+// Prepended to the `refreshTokenName` when kept in storage (nothing to do with refresh token responses)
+refreshTokenPrefix: 'aurelia',
+// Oauth Client Id
+clientId: false,
+
+// If the property defined by `refreshTokenProp` is an object:
+// ------------------------------------------------------------
+
+// This is the property from which to get the token `{ "refreshTokenProp": { "refreshTokenName" : '...' } }`
+refreshTokenName: 'token',
+// This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
+refreshTokenRoot: false,
 
 
 // Miscellaneous Options
@@ -347,8 +357,6 @@ withCredentials: true,
 platform: 'browser',
 // Determines the `window` property name upon which aurelia-authentication data is stored (Default: `window.localStorage`)
 storage: 'localStorage',
-// Prepended to the `tokenName` when kept in storage (nothing to do with)
-tokenPrefix: 'aurelia',
 
 
 // OAuth provider specific related configuration
@@ -367,7 +375,10 @@ providers: {
     display: 'popup',
     type: '2.0',
     /*clientId: '239531826023-ibk10mb9p7ull54j55a61og5lvnjrff6.apps.googleusercontent.com',*/
-    popupOptions: { width: 452, height: 633 }
+    popupOptions: {
+      width: 452,
+      height: 633
+    }
   },
   facebook: {
     name: 'facebook',
@@ -382,7 +393,10 @@ providers: {
     requiredUrlParams: ['nonce','display', 'scope'],
     display: 'popup',
     type: '2.0',
-    popupOptions: { width: 580, height: 400 }
+    popupOptions: {
+      width: 580,
+      height: 400
+    }
   },
   linkedin: {
     name: 'linkedin',
@@ -394,7 +408,10 @@ providers: {
     scopeDelimiter: ' ',
     state: 'STATE',
     type: '2.0',
-    popupOptions: { width: 527, height: 582 }
+    popupOptions: { 
+      width: 527,
+      height: 582
+    }
   },
   github: {
     name: 'github',
@@ -405,7 +422,10 @@ providers: {
     scope: ['user:email'],
     scopeDelimiter: ' ',
     type: '2.0',
-    popupOptions: { width: 1020, height: 618 }
+    popupOptions: {
+      width: 1020,
+      height: 618
+    }
   },
   yahoo: {
     name: 'yahoo',
@@ -415,14 +435,20 @@ providers: {
     scope: [],
     scopeDelimiter: ',',
     type: '2.0',
-    popupOptions: { width: 559, height: 519 }
+    popupOptions: {
+      width: 559,
+      height: 519
+    }
   },
   twitter: {
     name: 'twitter',
     url: '/auth/twitter',
     authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
     type: '1.0',
-    popupOptions: { width: 495, height: 645 }
+    popupOptions: {
+      width: 495,
+      height: 645
+    }
   },
   live: {
     name: 'live',
@@ -434,7 +460,25 @@ providers: {
     requiredUrlParams: ['display', 'scope'],
     display: 'popup',
     type: '2.0',
-    popupOptions: { width: 500, height: 560 }
+    popupOptions: {
+      width: 500,
+      height: 560
+    }
+  },
+  instagram: {
+    name: 'instagram',
+    url: '/auth/instagram',
+    authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    requiredUrlParams: ['scope'],
+    scope: ['basic'],
+    scopeDelimiter: '+',
+    display: 'popup',
+    type: '2.0',
+    popupOptions: {
+      width: 550,
+      height: 369
+    }
   }
 }
 ```
