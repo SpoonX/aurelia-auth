@@ -308,18 +308,18 @@ unlinkMethod: 'get',
 authHeader: 'Authorization',
 // The token name used in the header of API requests that require authentication
 authToken: 'Bearer',
-// The property name used when storing the token locally
-tokenStorage: 'aurelia_access_token',
-// The the property from which to get the authentication token after a successful login or signup
-responseTokenProp: 'access_token',
+// The property name used when storing the access token locally
+accessTokenStorage: 'aurelia_access_token',
+// The the property from which to get the access token after a successful login or signup
+accessTokenProp: 'access_token',
 
-// If the property defined by `responseTokenProp` is an object:
+// If the property defined by `accessTokenProp` is an object:
 // ------------------------------------------------------------
 
-//This is the property from which to get the token `{ "responseTokenProp": { "tokenName" : '...' } }`
-tokenName: 'token',
-// This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
-tokenRoot: false,
+//This is the property from which to get the token `{ "accessTokenProp": { "accessTokenName" : '...' } }`
+accessTokenName: 'token',
+// This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
+accessTokenRoot: false,
 
 
 // Refresh Token Options

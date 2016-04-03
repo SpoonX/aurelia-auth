@@ -31,7 +31,7 @@ export class Authentication {
   }
 
   getToken() {
-    return this.storage.get(this.config.tokenStorage);
+    return this.storage.get(this.config.accessTokenStorage);
   }
 
   getRefreshToken() {
@@ -39,7 +39,7 @@ export class Authentication {
   }
 
   getPayload() {
-    let token = this.storage.get(this.config.tokenStorage);
+    let token = this.storage.get(this.config.accessTokenStorage);
 
     if (token && token.split('.').length === 3) {
       let base64Url = token.split('.')[1];
@@ -53,7 +53,7 @@ export class Authentication {
   }
 
   setTokenFromResponse(response, redirect) {
-    let accessToken = response && response[this.config.responseTokenProp];
+    let accessToken = response && response[this.config.accessTokenProp];
     let token;
 
     if (accessToken) {
@@ -65,20 +65,20 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response[this.config.tokenRoot]
-        ? response[this.config.tokenRoot][this.config.tokenName]
-        : response[this.config.tokenName];
+      token = this.config.accessTokenRoot && response[this.config.accessTokenRoot]
+        ? response[this.config.accessTokenRoot][this.config.accessTokenName]
+        : response[this.config.accessTokenName];
     }
 
     if (!token) {
-      let tokenPath = this.config.tokenRoot
-        ? this.config.tokenRoot + '.' + this.config.tokenName
-        : this.config.tokenName;
+      let accessTokenPath = this.config.accessTokenRoot
+        ? this.config.accessTokenRoot + '.' + this.config.accessTokenName
+        : this.config.accessTokenName;
 
-      throw new Error('Expecting a token named "' + tokenPath + '" but instead got: ' + JSON.stringify(response));
+      throw new Error('Expecting a token named "' + accessTokenPath + '" but instead got: ' + JSON.stringify(response));
     }
 
-    this.storage.set(this.config.tokenStorage, token);
+    this.storage.set(this.config.accessTokenStorage, token);
 
     if (this.config.loginRedirect && !redirect) {
       window.location.href = this.config.loginRedirect;
@@ -117,7 +117,7 @@ export class Authentication {
   }
 
   removeToken() {
-    this.storage.remove(this.config.tokenStorage);
+    this.storage.remove(this.config.accessTokenStorage);
   }
 
   removeRefreshToken() {
@@ -125,7 +125,7 @@ export class Authentication {
   }
 
   isAuthenticated() {
-    let token = this.storage.get(this.config.tokenStorage);
+    let token = this.storage.get(this.config.accessTokenStorage);
 
     // There's no token, so user is not authenticated.
     if (!token) {
@@ -167,7 +167,7 @@ export class Authentication {
 
   logout(redirect) {
     return new Promise(resolve => {
-      this.storage.remove(this.config.tokenStorage);
+      this.storage.remove(this.config.accessTokenStorage);
       this.storage.remove(this.config.refreshTokenStorage);
 
       if (this.config.logoutRedirect && !redirect) {
