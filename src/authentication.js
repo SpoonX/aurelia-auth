@@ -10,14 +10,6 @@ export class Authentication {
     this.config  = config.current;
   }
 
-  get refreshTokenName() {
-    return authUtils.addTokenPrefix(this.config.refreshTokenPrefix, this.config.refreshTokenName);
-  }
-
-  get tokenName() {
-    return authUtils.addTokenPrefix(this.config.tokenPrefix, this.config.tokenName);
-  }
-
   getLoginRoute() {
     return this.config.loginRoute;
   }
@@ -39,15 +31,15 @@ export class Authentication {
   }
 
   getToken() {
-    return this.storage.get(this.tokenName);
+    return this.storage.get(this.config.tokenStorage);
   }
 
   getRefreshToken() {
-    return this.storage.get(this.refreshTokenName);
+    return this.storage.get(this.config.refreshTokenStorage);
   }
 
   getPayload() {
-    let token = this.storage.get(this.tokenName);
+    let token = this.storage.get(this.config.tokenStorage);
 
     if (token && token.split('.').length === 3) {
       let base64Url = token.split('.')[1];
@@ -61,7 +53,6 @@ export class Authentication {
   }
 
   setTokenFromResponse(response, redirect) {
-    let tokenName   = this.tokenName;
     let accessToken = response && response[this.config.responseTokenProp];
     let token;
 
@@ -74,16 +65,20 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response[this.config.tokenRoot] ? response[this.config.tokenRoot][this.config.tokenName] : response[this.config.tokenName];
+      token = this.config.tokenRoot && response[this.config.tokenRoot]
+        ? response[this.config.tokenRoot][this.config.tokenName]
+        : response[this.config.tokenName];
     }
 
     if (!token) {
-      let tokenPath = this.config.tokenRoot ? this.config.tokenRoot + '.' + this.config.tokenName : this.config.tokenName;
+      let tokenPath = this.config.tokenRoot
+        ? this.config.tokenRoot + '.' + this.config.tokenName
+        : this.config.tokenName;
 
       throw new Error('Expecting a token named "' + tokenPath + '" but instead got: ' + JSON.stringify(response));
     }
 
-    this.storage.set(tokenName, token);
+    this.storage.set(this.config.tokenStorage, token);
 
     if (this.config.loginRedirect && !redirect) {
       window.location.href = this.config.loginRedirect;
@@ -93,9 +88,7 @@ export class Authentication {
   }
 
   setRefreshTokenFromResponse(response) {
-    let refreshTokenName = this.refreshTokenName;
-    let refreshToken     = response && response.refresh_token;
-    let refreshTokenPath;
+    let refreshToken = response && response[this.config.refreshTokenProp];
     let token;
 
     if (refreshToken) {
@@ -111,27 +104,28 @@ export class Authentication {
         ? response[this.config.refreshTokenRoot][this.config.refreshTokenName]
         : response[this.config.refreshTokenName];
     }
+
     if (!token) {
-      refreshTokenPath = this.config.refreshTokenRoot
+      let refreshTokenPath = this.config.refreshTokenRoot
         ? this.config.refreshTokenRoot + '.' + this.config.refreshTokenName
         : this.config.refreshTokenName;
 
       throw new Error('Expecting a refresh token named "' + refreshTokenPath + '" but instead got: ' + JSON.stringify(response.content));
     }
 
-    this.storage.set(refreshTokenName, token);
+    this.storage.set(this.config.refreshTokenStorage, token);
   }
 
   removeToken() {
-    this.storage.remove(this.tokenName);
+    this.storage.remove(this.config.tokenStorage);
   }
 
   removeRefreshToken() {
-    this.storage.remove(this.refreshTokenName);
+    this.storage.remove(this.config.refreshTokenStorage);
   }
 
   isAuthenticated() {
-    let token = this.storage.get(this.tokenName);
+    let token = this.storage.get(this.config.tokenStorage);
 
     // There's no token, so user is not authenticated.
     if (!token) {
@@ -173,8 +167,8 @@ export class Authentication {
 
   logout(redirect) {
     return new Promise(resolve => {
-      this.storage.remove(this.tokenName);
-      this.storage.remove(this.refreshTokenName);
+      this.storage.remove(this.config.tokenStorage);
+      this.storage.remove(this.config.refreshTokenStorage);
 
       if (this.config.logoutRedirect && !redirect) {
         window.location.href = this.config.logoutRedirect;
