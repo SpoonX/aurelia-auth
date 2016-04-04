@@ -91,7 +91,7 @@ export class authUtils {
   }
 
   static addTokenPrefix(prefix = '', tokenNme) {
-    return prefix ? prefix + _  + tokenNme : tokenNme;
+    return prefix ? prefix + '_'  + tokenNme : tokenNme;
   }
 
   static joinUrl(baseUrl = '', url = '') {
