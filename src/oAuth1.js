@@ -8,9 +8,8 @@ import {BaseConfig} from './baseConfig';
 export class OAuth1 {
   constructor(storage, popup, config) {
     this.storage  = storage;
-    this.config   = config.current;
+    this.config   = config;
     this.popup    = popup;
-    this.client   = this.config.client;
     this.defaults = {
       url: null,
       name: null,
@@ -23,15 +22,15 @@ export class OAuth1 {
   open(options, userData) {
     let current = authUtils.extend({}, this.defaults, options);
 
-    let serverUrl = this.config.baseUrl ? authUtils.joinUrl(this.config.baseUrl, current.url) : current.url;
+    let serverUrl = this.config.current.baseUrl ? authUtils.joinUrl(this.config.current.baseUrl, current.url) : current.url;
 
-    if (this.config.platform !== 'mobile') {
+    if (this.config.current.platform !== 'mobile') {
       this.popup = this.popup.open('', current.name, current.popupOptions, current.redirectUri);
     }
 
-    return this.client.post(serverUrl)
+    return this.config.current.client.post(serverUrl)
       .then(response => {
-        if (this.config.platform === 'mobile') {
+        if (this.config.current.platform === 'mobile') {
           this.popup = this.popup.open(
             [
               current.authorizationEndpoint,
@@ -47,7 +46,7 @@ export class OAuth1 {
           ].join('?');
         }
 
-        let popupListener = this.config.platform === 'mobile' ? this.popup.eventListener(current.redirectUri) : this.popup.pollPopup();
+        let popupListener = this.config.current.platform === 'mobile' ? this.popup.eventListener(current.redirectUri) : this.popup.pollPopup();
 
         return popupListener.then(result => this.exchangeForToken(result, userData, current));
       });
@@ -55,10 +54,10 @@ export class OAuth1 {
 
   exchangeForToken(oauthData, userData, current) {
     let data                = authUtils.extend({}, userData, oauthData);
-    let exchangeForTokenUrl = this.config.baseUrl ? authUtils.joinUrl(this.config.baseUrl, current.url) : current.url;
-    let credentials         = this.config.withCredentials ? 'include' : 'same-origin';
+    let exchangeForTokenUrl = this.config.current.baseUrl ? authUtils.joinUrl(this.config.current.baseUrl, current.url) : current.url;
+    let credentials         = this.config.current.withCredentials ? 'include' : 'same-origin';
 
-    return this.client.post(exchangeForTokenUrl, data, {credentials: credentials});
+    return this.config.current.client.post(exchangeForTokenUrl, data, {credentials: credentials});
   }
 
   buildQueryString(obj) {

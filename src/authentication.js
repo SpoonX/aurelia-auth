@@ -7,35 +7,35 @@ import {authUtils} from './authUtils';
 export class Authentication {
   constructor(storage, config) {
     this.storage = storage;
-    this.config  = config.current;
+    this.config  = config;
   }
 
   get refreshTokenName() {
-    return authUtils.addTokenPrefix(this.config.refreshTokenPrefix, this.config.refreshTokenName);
+    return authUtils.addTokenPrefix(this.config.current.refreshTokenPrefix, this.config.current.refreshTokenName);
   }
 
   get tokenName() {
-    return authUtils.addTokenPrefix(this.config.tokenPrefix, this.config.tokenName);
+    return authUtils.addTokenPrefix(this.config.current.tokenPrefix, this.config.current.tokenName);
   }
 
   getLoginRoute() {
-    return this.config.loginRoute;
+    return this.config.current.loginRoute;
   }
 
   getLoginRedirect() {
-    return this.config.loginRedirect;
+    return this.config.current.loginRedirect;
   }
 
   getLoginUrl() {
-    return authUtils.joinUrl(this.config.baseUrl, this.config.loginUrl);
+    return authUtils.joinUrl(this.config.current.baseUrl, this.config.current.loginUrl);
   }
 
   getSignupUrl() {
-    return authUtils.joinUrl(this.config.baseUrl, this.config.signupUrl);
+    return authUtils.joinUrl(this.config.current.baseUrl, this.config.current.signupUrl);
   }
 
   getProfileUrl() {
-    return authUtils.joinUrl(this.config.baseUrl, this.config.profileUrl);
+    return authUtils.joinUrl(this.config.current.baseUrl, this.config.current.profileUrl);
   }
 
   getToken() {
@@ -62,7 +62,7 @@ export class Authentication {
 
   setTokenFromResponse(response, redirect) {
     let tokenName   = this.tokenName;
-    let accessToken = response && response[this.config.responseTokenProp];
+    let accessToken = response && response[this.config.current.responseTokenProp];
     let token;
 
     if (accessToken) {
@@ -74,19 +74,19 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.tokenRoot && response[this.config.tokenRoot] ? response[this.config.tokenRoot][this.config.tokenName] : response[this.config.tokenName];
+      token = this.config.current.tokenRoot && response[this.config.current.tokenRoot] ? response[this.config.current.tokenRoot][this.config.current.tokenName] : response[this.config.current.tokenName];
     }
 
     if (!token) {
-      let tokenPath = this.config.tokenRoot ? this.config.tokenRoot + '.' + this.config.tokenName : this.config.tokenName;
+      let tokenPath = this.config.current.tokenRoot ? this.config.current.tokenRoot + '.' + this.config.current.tokenName : this.config.current.tokenName;
 
       throw new Error('Expecting a token named "' + tokenPath + '" but instead got: ' + JSON.stringify(response));
     }
 
     this.storage.set(tokenName, token);
 
-    if (this.config.loginRedirect && !redirect) {
-      window.location.href = this.config.loginRedirect;
+    if (this.config.current.loginRedirect && !redirect) {
+      window.location.href = this.config.current.loginRedirect;
     } else if (redirect && authUtils.isString(redirect)) {
       window.location.href = window.encodeURI(redirect);
     }
@@ -107,14 +107,14 @@ export class Authentication {
     }
 
     if (!token && response) {
-      token = this.config.refreshTokenRoot && response[this.config.refreshTokenRoot]
-        ? response[this.config.refreshTokenRoot][this.config.refreshTokenName]
-        : response[this.config.refreshTokenName];
+      token = this.config.current.refreshTokenRoot && response[this.config.current.refreshTokenRoot]
+        ? response[this.config.current.refreshTokenRoot][this.config.current.refreshTokenName]
+        : response[this.config.current.refreshTokenName];
     }
     if (!token) {
-      refreshTokenPath = this.config.refreshTokenRoot
-        ? this.config.refreshTokenRoot + '.' + this.config.refreshTokenName
-        : this.config.refreshTokenName;
+      refreshTokenPath = this.config.current.refreshTokenRoot
+        ? this.config.current.refreshTokenRoot + '.' + this.config.current.refreshTokenName
+        : this.config.current.refreshTokenName;
 
       throw new Error('Expecting a refresh token named "' + refreshTokenPath + '" but instead got: ' + JSON.stringify(response.content));
     }
@@ -176,8 +176,8 @@ export class Authentication {
       this.storage.remove(this.tokenName);
       this.storage.remove(this.refreshTokenName);
 
-      if (this.config.logoutRedirect && !redirect) {
-        window.location.href = this.config.logoutRedirect;
+      if (this.config.current.logoutRedirect && !redirect) {
+        window.location.href = this.config.current.logoutRedirect;
       } else if (authUtils.isString(redirect)) {
         window.location.href = redirect;
       }
