@@ -1,11 +1,7 @@
 import {authUtils} from './authUtils';
-import {BaseConfig}  from './baseConfig';
-import {inject} from 'aurelia-dependency-injection';
 
-@inject(BaseConfig)
 export class Popup {
-  constructor(config) {
-    this.config      = config.current;
+  constructor() {
     this.popupWindow = null;
     this.polling     = null;
     this.url         = '';

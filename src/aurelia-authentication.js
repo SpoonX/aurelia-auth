@@ -36,23 +36,23 @@ function configure(aurelia, config) {
     });
   }
 
-  let client;
+  let aClient;
 
   // Let's see if there's a configured named or default client.
   if (baseConfig.current.endpoint !== null) {
-    client = clientConfig.getEndpoint(baseConfig.current.endpoint);
-    if (!client) {
+    aClient = clientConfig.getEndpoint(baseConfig.current.endpoint);
+    if (!aClient) {
       throw new Error(`There is no '${baseConfig.current.endpoint || 'default'}' endpoint registered.`);
     }
   }
 
   // No? Fine. Default to HttpClient. BC all the way.
-  if (!(client instanceof Rest)) {
-    client = new Rest(aurelia.container.get(HttpClient));
+  if (!(aClient instanceof Rest)) {
+    aClient = new Rest(aurelia.container.get(HttpClient));
   }
 
   // Set the client on the config, for use throughout the plugin.
-  baseConfig.current.client = client;
+  baseConfig.current.client = aClient;
 }
 
 export {

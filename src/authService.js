@@ -11,9 +11,12 @@ export class AuthService {
     this.authentication = authentication;
     this.oAuth1         = oAuth1;
     this.oAuth2         = oAuth2;
-    this.config         = config.current;
-    this.client         = this.config.client;
+    this.config         = config;
     this.isRefreshing   = false;
+  }
+
+  get client() {
+    return this.config.current.client;
   }
 
   getMe(criteria) {
@@ -40,7 +43,7 @@ export class AuthService {
 
   isAuthenticated() {
     let isExpired = this.authentication.isTokenExpired();
-    if (isExpired && this.config.autoUpdateToken) {
+    if (isExpired && this.config.current.autoUpdateToken) {
       if (this.isRefreshing) {
         return true;
       }
@@ -72,10 +75,10 @@ export class AuthService {
     }
     return this.client.post(signupUrl, content)
       .then(response => {
-        if (this.config.loginOnSignup) {
+        if (this.config.current.loginOnSignup) {
           this.authentication.setTokenFromResponse(response);
-        } else if (this.config.signupRedirect) {
-          window.location.href = this.config.signupRedirect;
+        } else if (this.config.current.signupRedirect) {
+          window.location.href = this.config.current.signupRedirect;
         }
 
         return response;
@@ -89,15 +92,15 @@ export class AuthService {
       content = arguments[0];
     } else {
       content = {email: email, password: password};
-      if (this.config.clientId) {
-        content.client_id = this.config.clientId;
+      if (this.config.current.clientId) {
+        content.client_id = this.config.current.clientId;
       }
     }
 
     return this.client.post(this.authentication.getLoginUrl(), content)
       .then(response => {
         this.authentication.setTokenFromResponse(response);
-        if (this.config.useRefreshToken) {
+        if (this.config.current.useRefreshToken) {
           this.authentication.setRefreshTokenFromResponse(response);
         }
 
@@ -116,8 +119,8 @@ export class AuthService {
 
     if (refreshToken) {
       content = {grant_type: 'refresh_token', refresh_token: refreshToken};
-      if (this.config.clientId) {
-        content.client_id = this.config.clientId;
+      if (this.config.current.clientId) {
+        content.client_id = this.config.current.clientId;
       }
 
       return this.client.post(this.authentication.getLoginUrl(), content)
@@ -139,11 +142,11 @@ export class AuthService {
 
   authenticate(name, redirect, userData) {
     let provider = this.oAuth2;
-    if (this.config.providers[name].type === '1.0') {
+    if (this.config.current.providers[name].type === '1.0') {
       provider = this.oAuth1;
     }
 
-    return provider.open(this.config.providers[name], userData || {})
+    return provider.open(this.config.current.providers[name], userData || {})
       .then(response => {
         this.authentication.setTokenFromResponse(response, redirect);
         return response;
@@ -151,11 +154,11 @@ export class AuthService {
   }
 
   unlink(provider) {
-    let unlinkUrl = this.config.baseUrl ? authUtils.joinUrl(this.config.baseUrl, this.config.unlinkUrl) : this.config.unlinkUrl;
+    let unlinkUrl = this.config.current.baseUrl ? authUtils.joinUrl(this.config.current.baseUrl, this.config.current.unlinkUrl) : this.config.current.unlinkUrl;
 
-    if (this.config.unlinkMethod === 'get') {
+    if (this.config.current.unlinkMethod === 'get') {
       return this.client.find(unlinkUrl + provider);
-    } else if (this.config.unlinkMethod === 'post') {
+    } else if (this.config.current.unlinkMethod === 'post') {
       return this.client.post(unlinkUrl, provider);
     }
   }

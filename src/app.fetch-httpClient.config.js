@@ -18,7 +18,7 @@ export class FetchConfig {
     this.httpClient   = httpClient;
     this.clientConfig = clientConfig;
     this.authService  = authService;
-    this.config       = config.current;
+    this.config       = config;
   }
 
   /**
@@ -29,16 +29,16 @@ export class FetchConfig {
   get interceptor() {
     return {
       request: (request) => {
-        if (!this.authService.isAuthenticated() || !this.config.httpInterceptor) {
+        if (!this.authService.isAuthenticated() || !this.config.current.httpInterceptor) {
           return request;
         }
         let token = this.authService.getCurrentToken();
 
-        if (this.config.authHeader && this.config.authToken) {
-          token = `${this.config.authToken} ${token}`;
+        if (this.config.current.authHeader && this.config.current.authToken) {
+          token = `${this.config.current.authToken} ${token}`;
         }
 
-        request.headers.set(this.config.authHeader, token);
+        request.headers.set(this.config.current.authHeader, token);
 
         return request;
       },
@@ -50,7 +50,7 @@ export class FetchConfig {
           if (response.status !== 401) {
             return resolve(response);
           }
-          if (!this.authService.isTokenExpired() || !this.config.httpInterceptor) {
+          if (!this.authService.isTokenExpired() || !this.config.current.httpInterceptor) {
             return resolve(response);
           }
           if (!this.authService.getRefreshToken()) {
@@ -58,8 +58,8 @@ export class FetchConfig {
           }
           this.authService.updateToken().then(() => {
             let token = this.authService.getCurrentToken();
-            if (this.config.authHeader && this.config.authToken) {
-              token = `${this.config.authToken} ${token}`;
+            if (this.config.current.authHeader && this.config.current.authToken) {
+              token = `${this.config.current.authToken} ${token}`;
             }
             request.headers.append('Authorization', token);
             return this.client.fetch(request).then(resolve);
@@ -70,34 +70,34 @@ export class FetchConfig {
   }
 
   /**
-   * @param {HttpClient|Rest[]} client
+   * @param {HttpClient|Rest[]} aClient
    *
    * @return {HttpClient[]}
    */
-  configure(client) {
-    if (Array.isArray(client)) {
+  configure(aClient) {
+    if (Array.isArray(aClient)) {
       let configuredClients = [];
-      client.forEach(toConfigure => {
+      aClient.forEach(toConfigure => {
         configuredClients.push(this.configure(toConfigure));
       });
 
       return configuredClients;
     }
 
-    if (typeof client === 'string') {
-      let endpoint = this.clientConfig.getEndpoint(client);
+    if (typeof aClient === 'string') {
+      let endpoint = this.clientConfig.getEndpoint(aClient);
       if (!endpoint) {
-        throw new Error(`There is no '${client || 'default'}' endpoint registered.`);
+        throw new Error(`There is no '${aClient || 'default'}' endpoint registered.`);
       }
-      client = endpoint.client;
-    } else if (client instanceof Rest) {
-      client = client.client;
-    } else if (!(client instanceof HttpClient)) {
-      client = this.httpClient;
+      aClient = endpoint.client;
+    } else if (aClient instanceof Rest) {
+      aClient = aClient.client;
+    } else if (!(aClient instanceof HttpClient)) {
+      aClient = this.httpClient;
     }
 
-    client.interceptors.push(this.interceptor);
+    aClient.interceptors.push(this.interceptor);
 
-    return client;
+    return aClient;
   }
 }
