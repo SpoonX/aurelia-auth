@@ -315,29 +315,16 @@ unlinkUrl: '/auth/unlink/',
 // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
 unlinkMethod: 'get',
 
-// Refresh Token Options
-// =====================
 
-// Option to turn refresh tokens On/Off
-useRefreshToken: false,
-// The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
-autoUpdateToken: true,
-// This allows the refresh token to be a further object deeper `{ "responseTokenProp": { "refreshTokenRoot" : { "tokenName" : '...' } } }`
-refreshTokenRoot: false,
-// This is the property from which to get the token `{ "responseTokenProp": { "refreshTokenName" : '...' } }`
-refreshTokenName: 'refresh_token',
-// Prepended to the `refreshTokenName` when kept in storage (nothing to do with)
-refreshTokenPrefix: 'aurelia',
-// Oauth Client Id
-clientId: false,
-
-// Token Related options
-// =====================
+// Token Options
+// =============
 
 // The header property used to contain the authToken in the header of API requests that require authentication
 authHeader: 'Authorization',
 // The token name used in the header of API requests that require authentication
 authToken: 'Bearer',
+// The property name used when storing the token locally
+tokenStorage: 'aurelia_access_token',
 // The the property from which to get the authentication token after a successful login or signup
 responseTokenProp: 'access_token',
 
@@ -348,6 +335,27 @@ responseTokenProp: 'access_token',
 tokenName: 'token',
 // This allows the token to be a further object deeper `{ "responseTokenProp": { "tokenRoot" : { "tokenName" : '...' } } }`
 tokenRoot: false,
+
+
+// Refresh Token Options
+// =====================
+
+// Option to turn refresh tokens On/Off
+useRefreshToken: false,
+// The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
+autoUpdateToken: true,
+// Oauth Client Id
+clientId: false,
+// The property name used when storing the refresh token locally
+refreshTokenStorage: 'aurelia_refresh_token',
+      
+// If `refresh_token` is an object:
+// ------------------------------------------------------------
+
+// This is the property from which to get the token `{ "refresh_token": { "refreshTokenName" : '...' } }`
+refreshTokenName: 'refresh_token',
+// This allows the refresh token to be a further object deeper `{ "refresh_token": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
+refreshTokenRoot: false,
 
 
 // Miscellaneous Options
@@ -362,8 +370,6 @@ withCredentials: true,
 platform: 'browser',
 // Determines the `window` property name upon which aurelia-authentication data is stored (Default: `window.localStorage`)
 storage: 'localStorage',
-// Prepended to the `tokenName` when kept in storage (nothing to do with)
-tokenPrefix: 'aurelia',
 
 
 // OAuth provider specific related configuration
@@ -450,6 +456,18 @@ providers: {
     display: 'popup',
     type: '2.0',
     popupOptions: { width: 500, height: 560 }
+  },
+  instagram: {
+    name: 'instagram',
+    url: '/auth/instagram',
+    authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
+    redirectUri: window.location.origin || window.location.protocol + '//' + window.location.host,
+    requiredUrlParams: ['scope'],
+    scope: ['basic'],
+    scopeDelimiter: '+',
+    display: 'popup',
+    type: '2.0',
+    popupOptions: { width: 550, height: 369 }
   }
 }
 ```

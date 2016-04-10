@@ -90,10 +90,6 @@ export class authUtils {
     return obj;
   }
 
-  static addTokenPrefix(prefix = '', tokenNme) {
-    return prefix ? prefix + _  + tokenNme : tokenNme;
-  }
-
   static joinUrl(baseUrl = '', url = '') {
     if (/^(?:[a-z]+:)?\/\//i.test(url)) {
       return url;
