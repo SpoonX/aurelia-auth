@@ -7,7 +7,9 @@ import {AuthorizeStep} from './authorizeStep';
 import {AuthenticateStep} from './authenticateStep';
 import {BaseConfig} from './baseConfig';
 import {FetchConfig} from './fetchClientConfig';
-import './authFilter';
+import './value-converters/authFilter';
+import './value-converters/isRouteAuth';
+import './value-converters/isAuth';
 
 /**
  * Configure the plugin.
@@ -21,7 +23,9 @@ function configure(aurelia, config) {
     PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
   }
 
-  aurelia.globalResources('./authFilter');
+  aurelia.globalResources('./value-converters/authFilter');
+  aurelia.globalResources('./value-converters/isRouteAuth');
+  aurelia.globalResources('./value-converters/isAuth');
 
   const baseConfig = aurelia.container.get(BaseConfig);
 
