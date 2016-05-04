@@ -22,13 +22,12 @@ const tokenFuture = {
 
 const sessionToken = {
   id: 'IgBKqIaQ0Dsrs1VkBqn5mM3kXs1BcZDdgDwpn6g7h4iEONWnkeTSaIUzgvUduuSk',
-  ttl: 1209600,
-  created: '2016-04-17T09:00:40.773Z',
+  expires: '2018-04-17T09:00:40.773Z',
   userId: 1
 };
 
 const otherToken = {
-  access_token: 'xx.yy.zz',
+  access_token: 'xx.yy.zz'
 };
 
 describe('Authentication', () => {
@@ -180,15 +179,15 @@ describe('Authentication', () => {
       expect(exp).toBe(Number(tokenPast.payload.exp));
     });
 
-    it('Should get exp from sessionToken.created', () => {
+    it('Should get exp from sessionToken.expires', () => {
       authentication.config.accessTokenProp = 'id';
-      authentication.config.accessTokenExpProp = 'created';
+      authentication.config.accessTokenExpProp = 'expires';
 
       authentication.responseObject = sessionToken;
 
       const exp = authentication.getExp();
       expect(typeof exp === 'number').toBe(true);
-      expect(exp).toBe(Number(new Date(sessionToken.created)));
+      expect(exp).toBe(Number(new Date(sessionToken.expires)));
 
       authentication.config.accessTokenProp = 'access_token';
       authentication.config.accessTokenExpProp = 'exp';
@@ -223,12 +222,12 @@ describe('Authentication', () => {
 
     it('Should be exp-currentTime for sessionToken', () => {
       authentication.config.accessTokenProp = 'id';
-      authentication.config.accessTokenExpProp = 'created';
+      authentication.config.accessTokenExpProp = 'expires';
       authentication.responseObject = sessionToken;
 
       const timeLeft = authentication.getTtl();
       expect(typeof timeLeft === 'number').toBe(true);
-      expect(timeLeft).toBe(Number(new Date(sessionToken.created)) - Math.round(new Date().getTime() / 1000));
+      expect(timeLeft).toBe(Number(new Date(sessionToken.expires)) - Math.round(new Date().getTime() / 1000));
 
       authentication.config.accessTokenProp = 'access_token';
       authentication.config.accessTokenExpProp = 'exp';
@@ -269,7 +268,7 @@ describe('Authentication', () => {
 
     it('Should be boolean for sessionToken', () => {
       authentication.config.accessTokenProp = 'id';
-      authentication.config.accessTokenExpProp = 'created';
+      authentication.config.accessTokenExpProp = 'expires';
       authentication.responseObject = sessionToken;
 
       const isTokenExpired = authentication.isTokenExpired();
