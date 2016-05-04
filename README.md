@@ -130,27 +130,29 @@ export class Login {
 authService
   // the Rest instance of aurelia-api used for requests. '.client.client' is the used httpClient instance (from aurelia-fetch-client)
   .client
-  // signup into server with credentials and optionally logs in
+  // the current configutation object
+  .config
+  // signup with credentials and optionally logs in
   .signup(credentials: Object)): Promise<Response>
-   // log into server with credentials. Stores response if successful
+   // log in with credentials. Stores response/token if successful
   .login(credentials: Object): Promise<Response>
-  // deletes stored response
+  // deletes the stored response/token
   .logout([redirectUri: string]): Promise<>
   // manually refresh authentication. Needs refreshToken options to be configured
   .updateToken(): Promise<Response> {
-  // link third-party account or log into server via third-party authentication. Stores response if successful
+  // link a third-party account or log into server via third-party authentication. Stores response/token if successful
   .authenticate(provider: string[, redirectUri: string][, userData: Object]): Promise<Response>
-  // unlink third-party
+  // unlink a third-party
   .unlink(provider: string): Promise<Response>
   // get profile
   .getMe([criteria: Object|string|number]): Promise<Response>
   // update profile
   .updateMe(data: Object[,criteria: Object|string|number]): Promise<Response>
-  // check if token is available and, if applicable, not expired
+  // check if a token is available and, if applicable, not expired
   .isAuthenticated(): boolean
-  // get token payload if available
+  // get the token payload if available (JWT) or else return the login response
   .getTokenPayload(): string
-  // get the token ttl if available
+  // get the tokens ttl if available
   .getTtl(): Number
 ```
 

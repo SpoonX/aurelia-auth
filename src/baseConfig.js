@@ -88,6 +88,12 @@ export class BaseConfig {
   // This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
   accessTokenRoot = false;
 
+  // Token properties
+  // ------------------------------------------------------------
+
+  // The payload property (for JWT) or responseObject properties for the expiration date. Accepts Number or Date
+  accessTokenExpProp = 'exp';
+
 
   // Refresh Token Options
   // =====================

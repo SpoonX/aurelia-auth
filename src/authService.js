@@ -79,9 +79,9 @@ export class AuthService {
   }
 
  /**
-  * Gets authentication status
+  * Gets authentication status. Auto-updates the token is so specified in the config
   *
-  * @returns {Boolean} true: for Non-JWT and unexpired JWT, false: else
+  * @returns {Boolean} checks if a token present and, if applicable, that token isn't expired
   */
   isAuthenticated() {
     let authenticated = this.authentication.isAuthenticated();
@@ -101,25 +101,25 @@ export class AuthService {
   /**
    * Gets ttl in seconds
    *
-   * @returns {Number} ttl for JWT tokens, NaN for all other tokens
+   * @returns {Number} gets ttl from expiration date. if expiration date in unknown, returns NaN
    */
   getTtl() {
     return this.authentication.getTtl();
   }
 
  /**
-  * Gets exp from token payload and compares to current time
+  * Tests if the token is expired
   *
-  * @returns {Boolean} returns (ttl > 0)? for JWT, undefined other tokens
+  * @returns {Boolean} if ttl is known, returns (ttl > 0)?, else returns undefined
   */
   isTokenExpired() {
     return this.authentication.isTokenExpired();
   }
 
   /**
-  * Get payload from tokens
+  * Gets payload from token or from login response
   *
-  * @returns {null | String} null: Non-JWT payload, String: JWT token payload
+  * @returns {{}} returns token payload for JWT or login response for other tokens
   */
   getTokenPayload() {
     return this.authentication.getPayload();

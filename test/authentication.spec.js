@@ -20,6 +20,15 @@ const tokenFuture = {
   jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidG9rZW5GdXR1cmUiLCJhZG1pbiI6dHJ1ZSwiZXhwIjoiMjQ2MDAxNzE1NCJ9.iHXLzWGY5U9WwVT4IVRLuKTf65XpgrA1Qq_Jlynv6bc'
 };
 
+const sessionToken = {
+  id: 'IgBKqIaQ0Dsrs1VkBqn5mM3kXs1BcZDdgDwpn6g7h4iEONWnkeTSaIUzgvUduuSk',
+  expires: '2018-04-17T09:00:40.773Z',
+  userId: 1
+};
+
+const otherToken = {
+  access_token: 'xx.yy.zz'
+};
 
 describe('Authentication', () => {
   describe('.constructor()', () => {
@@ -59,17 +68,17 @@ describe('Authentication', () => {
     });
 
     it('Should get stored responseObject', () => {
-      window.localStorage.setItem('aurelia_authentication', JSON.stringify({access_token: 'another'}));
+      window.localStorage.setItem('aurelia_authentication', JSON.stringify(otherToken));
 
       const responseObject = authentication.responseObject;
       expect(typeof responseObject === 'object').toBe(true);
-      expect(responseObject.access_token).toBe('another');
+      expect(responseObject.access_token).toBe(otherToken.access_token);
     });
 
     it('Should set with object', () => {
-      authentication.responseObject = {access_token: 'some'};
+      authentication.responseObject = otherToken;
 
-      expect(JSON.parse(window.localStorage.getItem('aurelia_authentication')).access_token).toBe('some');
+      expect(window.localStorage.getItem('aurelia_authentication')).toBe(JSON.stringify(otherToken));
     });
 
     it('Should delete', () => {
@@ -79,6 +88,7 @@ describe('Authentication', () => {
       expect(window.localStorage.getItem('aurelia_authentication')).toBe(null);
     });
   });
+
 
   describe('.getAccessToken()', () => {
     const container      = new Container();
@@ -90,11 +100,12 @@ describe('Authentication', () => {
     });
 
     it('Should analyze response first and return accessToken', () => {
-      authentication.responseObject = {access_token: 'some'};
+      authentication.responseObject = otherToken;
 
-      expect(authentication.getAccessToken()).toBe('some');
+      expect(authentication.getAccessToken()).toBe(otherToken.access_token);
     });
   });
+
 
   describe('.getRefreshToken()', () => {
     const container      = new Container();
@@ -114,6 +125,7 @@ describe('Authentication', () => {
     });
   });
 
+
   describe('.getPayload()', () => {
     const container      = new Container();
     const authentication = container.get(Authentication);
@@ -124,17 +136,20 @@ describe('Authentication', () => {
     });
 
     it('Should return null for JWT-like token', () => {
-      authentication.responseObject = {token: 'xx.yy.zz'};
-      const payload = authentication.payload;
+      authentication.responseObject = otherToken;
+      const payload = authentication.getPayload();
 
-      expect(payload).toBe(null);
+      expect(JSON.stringify(payload)).toBe(JSON.stringify(authentication.responseObject));
     });
 
     it('Should return null for non-JWT-like token', () => {
-      authentication.responseObject = {token: 'some'};
-      const payload = authentication.payload;
+      authentication.config.accessTokenProp = 'id';
+      authentication.responseObject = sessionToken;
+      const payload = authentication.getPayload();
 
-      expect(payload).toBe(null);
+      expect(JSON.stringify(payload)).toBe(JSON.stringify(authentication.responseObject));
+
+      authentication.config.accessTokenProp = 'access_token';
     });
 
     it('Should analyze response first and return payload', () => {
@@ -146,6 +161,7 @@ describe('Authentication', () => {
     });
   });
 
+
   describe('.getExp()', () => {
     const container      = new Container();
     const authentication = container.get(Authentication);
@@ -155,12 +171,26 @@ describe('Authentication', () => {
       authentication.deleteData();
     });
 
-    it('Should analyze response first and return exp', () => {
+    it('Should get exp from JWT', () => {
       authentication.responseObject = {token: tokenPast.jwt};
 
       const exp = authentication.getExp();
       expect(typeof exp === 'number').toBe(true);
       expect(exp).toBe(Number(tokenPast.payload.exp));
+    });
+
+    it('Should get exp from sessionToken.expires', () => {
+      authentication.config.accessTokenProp = 'id';
+      authentication.config.accessTokenExpProp = 'expires';
+
+      authentication.responseObject = sessionToken;
+
+      const exp = authentication.getExp();
+      expect(typeof exp === 'number').toBe(true);
+      expect(exp).toBe(Number(new Date(sessionToken.expires)));
+
+      authentication.config.accessTokenProp = 'access_token';
+      authentication.config.accessTokenExpProp = 'exp';
     });
   });
 
@@ -175,7 +205,7 @@ describe('Authentication', () => {
     });
 
     it('Should be NaN for Non-JWT', () => {
-      authentication.responseObject = {token: 'some'};
+      authentication.responseObject = otherToken;
       const timeLeft = authentication.getTtl();
 
       expect(typeof timeLeft === 'number').toBe(true);
@@ -189,6 +219,19 @@ describe('Authentication', () => {
       expect(typeof timeLeft === 'number').toBe(true);
       expect(timeLeft).toBe(tokenPast.payload.exp - Math.round(new Date().getTime() / 1000));
     });
+
+    it('Should be exp-currentTime for sessionToken', () => {
+      authentication.config.accessTokenProp = 'id';
+      authentication.config.accessTokenExpProp = 'expires';
+      authentication.responseObject = sessionToken;
+
+      const timeLeft = authentication.getTtl();
+      expect(typeof timeLeft === 'number').toBe(true);
+      expect(timeLeft).toBe(Number(new Date(sessionToken.expires)) - Math.round(new Date().getTime() / 1000));
+
+      authentication.config.accessTokenProp = 'access_token';
+      authentication.config.accessTokenExpProp = 'exp';
+    });
   });
 
   describe('.isTokenExpired()', () => {
@@ -201,7 +244,7 @@ describe('Authentication', () => {
     });
 
     it('Should be undefined for Non-JWT', () => {
-      authentication.responseObject = {token: 'some'};
+      authentication.responseObject = otherToken;
       const isTokenExpired = authentication.isTokenExpired();
 
       expect(isTokenExpired).toBe(undefined);
@@ -222,6 +265,18 @@ describe('Authentication', () => {
       expect(typeof isTokenExpired === 'boolean').toBe(true);
       expect(isTokenExpired).toBe(false);
     });
+
+    it('Should be boolean for sessionToken', () => {
+      authentication.config.accessTokenProp = 'id';
+      authentication.config.accessTokenExpProp = 'expires';
+      authentication.responseObject = sessionToken;
+
+      const isTokenExpired = authentication.isTokenExpired();
+      expect(typeof isTokenExpired === 'boolean').toBe(true);
+
+      authentication.config.accessTokenProp = 'access_token';
+      authentication.config.accessTokenExpProp = 'exp';
+    });
   });
 
 
@@ -241,14 +296,17 @@ describe('Authentication', () => {
     });
 
     it('Should be true when non-JWT token present', () => {
-      authentication.responseObject = {token: 'some'};
+      authentication.config.accessTokenProp = 'id';
+      authentication.responseObject = sessionToken;
       const isAuthenticated = authentication.isAuthenticated();
 
       expect(isAuthenticated).toBe(true);
+
+      authentication.config.accessTokenProp = 'access_token';
     });
 
     it('Should be true when JWT-like token present', () => {
-      authentication.responseObject = {token: 'xx.yy.zz'};
+      authentication.responseObject = otherToken;
       const isAuthenticated = authentication.isAuthenticated();
 
       expect(isAuthenticated).toBe(true);
@@ -327,20 +385,25 @@ describe('Authentication', () => {
     });
 
     it('Should set data from non-JWT response', () => {
-      authentication.getDataFromResponse({access_token: 'token'});
+      const response = sessionToken;
+      authentication.config.accessTokenProp = 'id';
+      authentication.getDataFromResponse(response);
 
       expect(authentication.hasDataStored).toBe(true);
-      expect(authentication.accessToken).toBe('token');
-      expect(authentication.payload).toBe(null);
+      expect(authentication.accessToken).toBe(sessionToken.id);
+      expect(JSON.stringify(authentication.payload)).toBe(JSON.stringify(response));
       expect(Number.isNaN(authentication.exp)).toBe(true);
+
+      authentication.config.accessTokenProp = 'access_token';
     });
 
     it('Should set data from JWT-like response', () => {
-      authentication.getDataFromResponse({access_token: 'xx.yy.zz'});
+      const response = otherToken;
+      authentication.getDataFromResponse(response);
 
       expect(authentication.hasDataStored).toBe(true);
-      expect(authentication.accessToken).toBe('xx.yy.zz');
-      expect(authentication.payload).toBe(null);
+      expect(authentication.accessToken).toBe(otherToken.access_token);
+      expect(JSON.stringify(authentication.payload)).toBe(JSON.stringify(response));
       expect(Number.isNaN(authentication.exp)).toBe(true);
     });
 
