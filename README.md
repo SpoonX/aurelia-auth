@@ -43,6 +43,16 @@ AureliaWebpackPlugin({
   }),
 ```
 
+## Polyfills
+
+When targeting IE9 following polyfill is needed:
+
+```js
+if (!window.location.origin) {
+  window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+}
+```
+
 ## Documentation
 
 You can find usage examples and the documentation at the [aurelia-authentication-docs](http://aurelia-authentication.spoonx.org/).
