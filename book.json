@@ -1,0 +1,20 @@
+{
+    "root": "./doc/book",
+    "plugins": [
+        "edit-link",
+        "github",
+        "versions"
+    ],
+    "pluginsConfig": {
+        "edit-link": {
+            "base": "https://github.com/SpoonX/aurelia-authentication/edit/master/doc/book",
+            "label": "Edit This Page"
+        },
+        "github": {
+            "url": "https://github.com/spoonx/aurelia-authentication"
+        },
+        "versions": {
+            "type": "tags"
+        }
+    }
+}
