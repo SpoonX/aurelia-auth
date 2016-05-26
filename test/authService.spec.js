@@ -84,10 +84,14 @@ describe('AuthService', () => {
   });
 
 
-  describe('.updateMe()', () => {
+  describe('.updateMe() with PUT', () => {
     const container      = getContainer();
     const authService    = container.get(AuthService);
-
+    
+    beforeEach(() => {
+      authService.config.profileMethod = 'put';
+    });
+    
     it('without criteria', done => {
       authService.updateMe({data: 'some'})
         .then(result => {
@@ -133,6 +137,60 @@ describe('AuthService', () => {
     });
   });
 
+
+  describe('.updateMe() with PATCH', () => {
+    const container      = getContainer();
+    const authService    = container.get(AuthService);
+    
+    beforeEach(() => {
+      authService.config.profileMethod = 'patch';
+    });
+
+    it('without criteria', done => {
+      authService.updateMe({data: 'some'})
+        .then(result => {
+          expect(result.method).toBe('PATCH');
+          expect(result.path).toBe('/auth/me');
+          expect(JSON.stringify(result.query)).toBe('{}');
+          expect(result.body.data).toBe('some');
+          done();
+        });
+    });
+
+    it('with criteria a number', done => {
+      authService.updateMe({data: 'some'}, 5)
+        .then(result => {
+          expect(result.method).toBe('PATCH');
+          expect(result.path).toBe('/auth/me');
+          expect(result.query.id).toBe('5');
+          expect(result.body.data).toBe('some');
+          done();
+        });
+    });
+
+    it('with criteria a string', done => {
+      authService.updateMe({data: 'some'}, 'five')
+        .then(result => {
+          expect(result.method).toBe('PATCH');
+          expect(result.path).toBe('/auth/me');
+          expect(result.query.id).toBe('five');
+          expect(result.body.data).toBe('some');
+          done();
+        });
+    });
+
+    it('with criteria an object', done => {
+      authService.updateMe({data: 'some'}, {foo: 'bar'})
+        .then(result => {
+          expect(result.method).toBe('PATCH');
+          expect(result.path).toBe('/auth/me');
+          expect(result.query.foo).toBe('bar');
+          expect(result.body.data).toBe('some');
+          done();
+        });
+    });
+  });
+  
 
   describe('.getAccessToken()', () => {
     const container      = getContainer();

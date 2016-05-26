@@ -52,7 +52,10 @@ export class AuthService {
     if (typeof criteria === 'string' || typeof criteria === 'number') {
       criteria = { id: criteria };
     }
-    return this.client.update(this.config.withBase(this.config.profileUrl), criteria, body);
+    if (this.config.profileMethod === 'put') {
+      return this.client.update(this.config.withBase(this.config.profileUrl), criteria, body);
+    }
+    return this.client.patch(this.config.withBase(this.config.profileUrl), criteria, body);
   }
 
   /**
