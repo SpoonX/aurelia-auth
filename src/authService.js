@@ -1,3 +1,4 @@
+import {PLATFORM} from 'aurelia-pal';
 import {inject} from 'aurelia-dependency-injection';
 import {deprecated} from 'aurelia-metadata';
 import * as LogManager from 'aurelia-logging';
@@ -63,14 +64,14 @@ export class AuthService {
    * @type {Number} timeout time in ms
    */
   setTimeout(ttl) {
-    setTimeout(this.timeout, ttl);
+    PLATFORM.global.setTimeout(this.timeout, ttl);
   }
 
   /**
    * clears the login timeout
    */
   clearTimeout() {
-    clearTimeout(this.timeout);
+    PLATFORM.global.clearTimeout(this.timeout);
   }
 
   /**
@@ -332,7 +333,7 @@ export class AuthService {
   logout(redirectUri) {
     let localLogout = response => new Promise(resolve => {
       this.setResponseObject(null);
-      clearTimeout(this.timeout);
+      this.clearTimeout();
 
       this.authentication.redirect(redirectUri, this.config.logoutRedirect);
 

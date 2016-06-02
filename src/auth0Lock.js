@@ -1,5 +1,5 @@
-import {inject} from 'aurelia-dependency-injection';
 import {PLATFORM} from 'aurelia-pal';
+import {inject} from 'aurelia-dependency-injection';
 import extend from 'extend';
 
 import {Storage} from './storage';
@@ -43,7 +43,7 @@ export class Auth0Lock {
 
     this.lock = this.lock || new PLATFORM.global.Auth0Lock(provider.clientId, provider.clientDomain);
 
-    const openPopup = new Promise(function(resolve, reject) {
+    const openPopup = new Promise((resolve, reject) => {
       let opts = provider.lockOptions;
       opts.popupOptions = provider.popupOptions;
       opts.responseType = provider.responseType;
@@ -62,7 +62,7 @@ export class Auth0Lock {
           });
         }
       });
-    }.bind(this));
+    });
 
     return openPopup
       .then(lockResponse => {

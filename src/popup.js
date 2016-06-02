@@ -57,7 +57,7 @@ export class Popup {
 
   pollPopup() {
     return new Promise((resolve, reject) => {
-      this.polling = setInterval(() => {
+      this.polling = PLATFORM.global.setInterval(() => {
         let errorData;
 
         try {
@@ -72,20 +72,20 @@ export class Popup {
             }
 
             this.popupWindow.close();
-            clearInterval(this.polling);
+            PLATFORM.global.clearInterval(this.polling);
           }
         } catch (error) {
           errorData = error;
         }
 
         if (!this.popupWindow) {
-          clearInterval(this.polling);
+          PLATFORM.global.clearInterval(this.polling);
           reject({
             error: errorData,
             data: 'Provider Popup Blocked'
           });
         } else if (this.popupWindow.closed) {
-          clearInterval(this.polling);
+          PLATFORM.global.clearInterval(this.polling);
           reject({
             error: errorData,
             data: 'Problem poll popup'

@@ -52,11 +52,18 @@ describe('aurelia-authentication', function() {
     it('Should call globalResources configuration to be passed as a function.', function() {
       let container = new Container();
 
+      let globalResources = [];
       configure({
         container: container, globalResources: resource => {
-          expect(resource).toEqual('./authFilter');
+          globalResources.push(resource);
         }
       }, noop);
+
+      const expected = ['./value-converters/authFilterValueConverter',
+                      './value-converters/routeAuthenticatedValueConverter',
+                      './value-converters/authenticatedValueConverter'];
+
+      expect(globalResources.toString()).toEqual(expected.toString());
     });
 
     it('Should allow configuration with a function.', function() {
