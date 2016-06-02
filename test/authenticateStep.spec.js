@@ -24,16 +24,15 @@ const routes = {
 describe('AuthenticateStep', () => {
   describe('.run()', () => {
     const authenticateStep = new Container().get(AuthenticateStep);
-    function next() {return;}
-    let loginRoute = authenticateStep.authentication.config.loginRoute;
+    let loginRoute = authenticateStep.authService.config.loginRoute;
 
     it('should not redirect when not authenticated and no route requires it', () => {
       let routingContext = {
         getAllInstructions: () => routes.authenticateNone
       };
 
+      function next() {return;}
       next.cancel = redirect => {throw new Error();};
-
       spyOn(next, 'cancel');
 
       authenticateStep.run(routingContext, next);
@@ -46,6 +45,7 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.authenticateChild
       };
 
+      function next() {return;}
       next.cancel = redirect => {
         expect(redirect.url).toBe(loginRoute);
         done();
@@ -59,6 +59,7 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.authenticateParent
       };
 
+      function next() {return;}
       next.cancel = redirect => {
         expect(redirect.url).toBe(loginRoute);
         done();
@@ -72,11 +73,11 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.authenticateNone
       };
 
+      function next() {return;}
       next.cancel = redirect => {throw new Error();};
-
       spyOn(next, 'cancel');
 
-      authenticateStep.authentication.isAuthenticated = () => true;
+      authenticateStep.authService.authenticated = true;
 
       authenticateStep.run(routingContext, next);
 
@@ -88,11 +89,11 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.authenticateChild
       };
 
+      function next() {return;}
       next.cancel = redirect => {throw new Error();};
-
       spyOn(next, 'cancel');
 
-      authenticateStep.authentication.isAuthenticated = () => true;
+      authenticateStep.authService.authenticated = true;
 
       authenticateStep.run(routingContext, next);
 
@@ -104,11 +105,11 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.authenticateParent
       };
 
+      function next() {return;}
       next.cancel = redirect => {throw new Error();};
-
       spyOn(next, 'cancel');
 
-      authenticateStep.authentication.isAuthenticated = () => true;
+      authenticateStep.authService.authenticated = true;
 
       authenticateStep.run(routingContext, next);
 
@@ -120,12 +121,13 @@ describe('AuthenticateStep', () => {
         getAllInstructions: () => routes.onLoginRoute
       };
 
+      function next() {return;}
       next.cancel = redirect => {
-        expect(redirect.url).toBe(authenticateStep.authentication.config.loginRedirect);
+        expect(redirect.url).toBe(authenticateStep.authService.config.loginRedirect);
         done();
       };
 
-      authenticateStep.authentication.isAuthenticated = () => true;
+      authenticateStep.authService.authenticated = true;
 
       authenticateStep.run(routingContext, next);
     });
