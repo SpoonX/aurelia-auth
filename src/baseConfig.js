@@ -142,7 +142,10 @@ export class BaseConfig {
   // The key used for storing the authentication response locally
   storageKey = 'aurelia_authentication';
 
-  //OAuth provider specific related configuration
+  // List of value-converters to make global
+  globalValueConverters = ['authFilterValueConverter', 'routeAuthenticatedValueConverter', 'authenticatedValueConverter'];
+
+//OAuth provider specific related configuration
   // ============================================
   providers = {
     facebook: {
