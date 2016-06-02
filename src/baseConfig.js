@@ -173,10 +173,7 @@ export class BaseConfig {
       display: 'popup',
       oauthType: '2.0',
       popupOptions: { width: 452, height: 633 },
-      state: function() {
-        let rand = Math.random().toString(36).substr(2);
-        return encodeURIComponent(rand);
-      }
+      state: randomState
     },
     github: {
       name: 'github',
@@ -274,9 +271,7 @@ export class BaseConfig {
         popup: true
       },
       responseType: 'token',
-      state: function() {
-        return Math.random().toString(36).substr(2);
-      }
+      state: randomState
     }
   };
 
@@ -341,4 +336,9 @@ export class BaseConfig {
   get tokenPrefix() {
     return this._tokenPrefix || 'aurelia';
   }
+}
+
+function randomState() {
+  let rand = Math.random().toString(36).substr(2);
+  return encodeURIComponent(rand);
 }
