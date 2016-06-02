@@ -10,20 +10,14 @@ export class Storage {
   }
 
   get(key) {
-    if (PLATFORM.global[this.config.storage]) {
-      return PLATFORM.global[this.config.storage].getItem(key);
-    }
+    return PLATFORM.global[this.config.storage].getItem(key);
   }
 
   set(key, value) {
-    if (PLATFORM.global[this.config.storage]) {
-      PLATFORM.global[this.config.storage].setItem(key, value);
-    }
+    PLATFORM.global[this.config.storage].setItem(key, value);
   }
 
   remove(key) {
-    if (PLATFORM.global[this.config.storage]) {
-      PLATFORM.global[this.config.storage].removeItem(key);
-    }
+    PLATFORM.global[this.config.storage].removeItem(key);
   }
 }
