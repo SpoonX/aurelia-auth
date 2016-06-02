@@ -1,23 +1,24 @@
 import {inject} from 'aurelia-dependency-injection';
-import {Authentication} from './authentication';
 import {Redirect} from 'aurelia-router';
 
-@inject(Authentication)
+import {AuthService} from './authService';
+
+@inject(AuthService)
 export class AuthenticateStep {
-  constructor(authentication) {
-    this.authentication = authentication;
+  constructor(authService) {
+    this.authService = authService;
   }
 
   run(routingContext, next) {
-    const isLoggedIn = this.authentication.isAuthenticated();
-    const loginRoute = this.authentication.config.loginRoute;
+    const isLoggedIn = this.authService.authenticated;
+    const loginRoute = this.authService.config.loginRoute;
 
-    if (routingContext.getAllInstructions().some(i => i.config.settings.authenticate === true)) {
+    if (routingContext.getAllInstructions().some(route => route.config.settings.authenticate === true)) {
       if (!isLoggedIn) {
         return next.cancel(new Redirect(loginRoute));
       }
-    } else if (isLoggedIn && routingContext.getAllInstructions().some(i => i.fragment === loginRoute)) {
-      return next.cancel(new Redirect( this.authentication.config.loginRedirect ));
+    } else if (isLoggedIn && routingContext.getAllInstructions().some(route => route.fragment === loginRoute)) {
+      return next.cancel(new Redirect( this.authService.config.loginRedirect ));
     }
 
     return next();
