@@ -4,13 +4,16 @@ import extend from 'extend';
 
 export class Popup {
   constructor() {
-    this.popupWindow = null;
-    this.polling     = null;
-    this.url         = '';
+    this.popupWindow  = null;
+    this.polling      = null;
+    this.url          = '';
+    this.redirectHash = null;
   }
 
-  open(url, windowName, options) {
+  open(url, windowName, options, redirectHash = null) {
     this.url = url;
+    this.redirectHash = redirectHash;
+
     const optionsString = buildPopupWindowOptions(options || {});
 
     this.popupWindow = PLATFORM.global.open(url, windowName, optionsString);
@@ -61,8 +64,11 @@ export class Popup {
         let errorData;
 
         try {
-          if (this.popupWindow.location.host ===  DOM.location.host
-            && (this.popupWindow.location.search || this.popupWindow.location.hash)) {
+          if ((this.popupWindow.location.hash === this.redirectHash
+            || this.popupWindow.location.host === DOM.location.host)
+          && (this.popupWindow.location.search
+            || this.popupWindow.location.hash)) {
+
             const qs = parseUrl(this.popupWindow.location);
 
             if (qs.error) {

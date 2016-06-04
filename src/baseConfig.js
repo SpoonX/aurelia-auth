@@ -153,6 +153,7 @@ export class BaseConfig {
       url: '/auth/facebook',
       authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
       redirectUri: PLATFORM.location.origin + '/',
+      redirectHash: '#_=_',
       requiredUrlParams: ['display', 'scope'],
       scope: ['email'],
       scopeDelimiter: ',',
