@@ -143,7 +143,7 @@ export class BaseConfig {
   storageKey = 'aurelia_authentication';
 
   // List of value-converters to make global
-  globalValueConverters = ['authFilterValueConverter', 'authenticatedFilterValueConverter', 'authenticatedValueConverter'];
+  globalValueConverters = ['authFilterValueConverter'];
 
 //OAuth provider specific related configuration
   // ============================================

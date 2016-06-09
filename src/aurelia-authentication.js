@@ -33,7 +33,7 @@ function configure(aurelia, config) {
   // after baseConfig was configured
   for (let converter of baseConfig.globalValueConverters) {
     aurelia.globalResources(`./${converter}`);
-    LogManager.getLogger('authentication').info(`Add globalResources value-converter: ${converter}`);
+    LogManager.getLogger('authentication').info(`Add globalResource: ${converter}`);
   }
   const fetchConfig  = aurelia.container.get(FetchConfig);
   const clientConfig = aurelia.container.get(Config);
