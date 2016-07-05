@@ -21,6 +21,14 @@
   "scripts": {
     "test": "./node_modules/.bin/gulp test"
   },
+  "typings": "typings/aurelia-authentication.d.ts",
+  "aurelia": {
+    "build": {
+      "resources": [
+        "authFilterValueConverter"
+      ]
+    }
+  },
   "jspm": {
     "registry": "npm",
     "jspmPackage": true,
