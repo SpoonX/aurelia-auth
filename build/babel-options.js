@@ -21,6 +21,15 @@ exports.base = function() {
   };
 };
 
+exports['plugin-typings'] = ['babel-dts-generator', {
+  packageName: 'typings',
+  typings: '',
+  suppressAmbientDeclaration: true,
+  suppressModulePath: true,
+  suppressComments: false,
+  memberOutputFilter: /^_.*/
+}];
+
 exports['plugin-dts'] = ['babel-dts-generator', {
   packageName: paths.packageName,
   typings: '',
@@ -58,3 +67,10 @@ exports.dts = function() {
   options.plugins.push(exports['plugin-dts']);
   return options;
 };
+
+exports.typings = function() {
+  var options = exports.base();
+  options.plugins.push(exports['plugin-typings']);
+  return options;
+};
+

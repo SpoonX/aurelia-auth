@@ -16,19 +16,25 @@ var vinylPaths = require('vinyl-paths');
 var jsName = paths.packageName + '.js';
 
 // concats submodules into one file, compiles d.ts file and copies them to the dist folders
-gulp.task('build-dts', function() {
-  var importsToAdd = []; // stores extracted imports
+function typingsGenerator(options) {
+  return function() {
+    var importsToAdd = []; // stores extracted imports
 
-  return gulp.src(paths.tsSource)
-    //.pipe(tools.sortFiles()) can't sort with excluded files of the tsSource
-    .pipe(through2.obj(function(file, enc, callback) {  // extract all imports to importsToAdd
-      file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
-      this.push(file);
-      return callback();
-    }))
-    .pipe(concat(jsName))
-    .pipe(to5(assign({}, compilerOptions.dts())));
-});
+    return gulp.src(paths.tsSource)
+      //.pipe(tools.sortFiles()) can't sort with excluded files of the tsSource
+      .pipe(through2.obj(function(file, enc, callback) {  // extract all imports to importsToAdd
+        file.contents = new Buffer(tools.extractImports(file.contents.toString('utf8'), importsToAdd));
+        this.push(file);
+        return callback();
+      }))
+      .pipe(concat(jsName))
+      .pipe(to5(assign({}, options())));
+  }
+}
+
+
+gulp.task('build-dts', typingsGenerator(compilerOptions.dts));
+gulp.task('build-typings', typingsGenerator(compilerOptions.typings));
 
 gulp.task('copy-dts', function() {
   var tdsPath = paths.packageName + '/' + paths.packageName + '.d.ts';
@@ -117,6 +123,7 @@ gulp.task('build-html-system', function() {
 gulp.task('build', function(callback) {
   return runSequence(
     'clean',
+    'build-typings',
     'build-dts',
     'copy-dts',
     'remove-dts-folder',
