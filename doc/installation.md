@@ -8,12 +8,15 @@ Run `jspm i aurelia-authentication` from your project root.
 
 Run `npm i aurelia-authentication --save` from your project root.
 
-Aurelia-authentication has submodules (currently only the `authFilterValueConverter`). So you need to add it to the AureliaWebpackPlugin includeSubModules list.
+Aurelia-authentication has submodules (currently only the `authFilterValueConverter`). So you need to add the additional resources to the "aurelia" section in your package.json
 
-```js
-AureliaWebpackPlugin({
-    includeSubModules: [
-      { moduleId: 'aurelia-authentication' }
+```json
+...
+"aurelia": {
+  "build": {
+    "resources": [
+      "aurelia-authentication/authFilterValueConverter"
     ]
-  }),
+  }
+}
 ```
