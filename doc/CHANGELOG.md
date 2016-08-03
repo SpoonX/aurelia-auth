@@ -1,3 +1,13 @@
+<a name="3.0.0-rc8"></a>
+## [3.0.0-rc8](https://github.com/spoonx/aurelia-authentication/compare/3.0.0-rc7...v3.0.0-rc8) (2016-08-03)
+
+
+### Bug Fixes
+
+* **popup:** removed '#' character from hash fragment in redirect URL from popup. (Issue [#223](https://github.com/spoonx/aurelia-authentication/issues/223)). ([baf9148](https://github.com/spoonx/aurelia-authentication/commit/baf9148))
+
+
+
 <a name="3.0.0-rc7"></a>
 ## [3.0.0-rc7](https://github.com/spoonx/aurelia-authentication/compare/3.0.0-rc2...v3.0.0-rc7) (2016-07-22)
 
