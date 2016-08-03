@@ -169,7 +169,9 @@ var buildPopupWindowOptions = function buildPopupWindowOptions(options) {
 };
 
 var parseUrl = function parseUrl(url) {
-  return extend(true, {}, parseQueryString(url.search), parseQueryString(url.hash));
+  var hash = url.hash.charAt(0) === '#' ? url.hash.substr(1) : url.hash;
+
+  return extend(true, {}, parseQueryString(url.search), parseQueryString(hash));
 };
 
 export var BaseConfig = function () {
