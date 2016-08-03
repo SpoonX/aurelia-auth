@@ -123,7 +123,9 @@ const buildPopupWindowOptions = options => {
 };
 
 const parseUrl = url => {
-  return extend(true, {}, parseQueryString(url.search), parseQueryString(url.hash));
+  let hash = (url.hash.charAt(0) === '#') ? url.hash.substr(1) : url.hash;
+
+  return extend(true, {}, parseQueryString(url.search), parseQueryString(hash));
 };
 
 export class BaseConfig {

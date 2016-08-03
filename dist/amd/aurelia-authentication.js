@@ -214,7 +214,9 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
   };
 
   var parseUrl = function parseUrl(url) {
-    return (0, _extend2.default)(true, {}, (0, _aureliaPath.parseQueryString)(url.search), (0, _aureliaPath.parseQueryString)(url.hash));
+    var hash = url.hash.charAt(0) === '#' ? url.hash.substr(1) : url.hash;
+
+    return (0, _extend2.default)(true, {}, (0, _aureliaPath.parseQueryString)(url.search), (0, _aureliaPath.parseQueryString)(hash));
   };
 
   var BaseConfig = exports.BaseConfig = function () {
