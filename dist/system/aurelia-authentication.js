@@ -41,6 +41,68 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
     return encodeURIComponent(rand);
   }
 
+  function configure(aurelia, config) {
+    if (!PLATFORM.location.origin) {
+      PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
+    }
+
+    var baseConfig = aurelia.container.get(BaseConfig);
+
+    if (typeof config === 'function') {
+      config(baseConfig);
+    } else if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) === 'object') {
+      baseConfig.configure(config);
+    }
+
+    for (var _iterator = baseConfig.globalValueConverters, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+      var _ref;
+
+      if (_isArray) {
+        if (_i >= _iterator.length) break;
+        _ref = _iterator[_i++];
+      } else {
+        _i = _iterator.next();
+        if (_i.done) break;
+        _ref = _i.value;
+      }
+
+      var converter = _ref;
+
+      aurelia.globalResources('./' + converter);
+      LogManager.getLogger('authentication').info('Add globalResources value-converter: ' + converter);
+    }
+    var fetchConfig = aurelia.container.get(FetchConfig);
+    var clientConfig = aurelia.container.get(Config);
+
+    if (Array.isArray(baseConfig.configureEndpoints)) {
+      baseConfig.configureEndpoints.forEach(function (endpointToPatch) {
+        fetchConfig.configure(endpointToPatch);
+      });
+    }
+
+    var client = void 0;
+
+    if (baseConfig.endpoint !== null) {
+      if (typeof baseConfig.endpoint === 'string') {
+        var endpoint = clientConfig.getEndpoint(baseConfig.endpoint);
+        if (!endpoint) {
+          throw new Error('There is no \'' + (baseConfig.endpoint || 'default') + '\' endpoint registered.');
+        }
+        client = endpoint;
+      } else if (baseConfig.endpoint instanceof HttpClient) {
+        client = new Rest(baseConfig.endpoint);
+      }
+    }
+
+    if (!(client instanceof Rest)) {
+      client = new Rest(aurelia.container.get(HttpClient));
+    }
+
+    baseConfig.client = client;
+  }
+
+  _export('configure', configure);
+
   return {
     setters: [function (_extend) {
       extend = _extend.default;
@@ -258,6 +320,9 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
           this.refreshTokenProp = 'refresh_token';
           this.refreshTokenName = 'token';
           this.refreshTokenRoot = false;
+          this.idTokenProp = 'id_token';
+          this.idTokenName = 'token';
+          this.idTokenRoot = false;
           this.httpInterceptor = true;
           this.withCredentials = true;
           this.platform = 'browser';
@@ -689,7 +754,7 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
           var openPopup = this.config.platform === 'mobile' ? popup.eventListener(provider.redirectUri) : popup.pollPopup();
 
           return openPopup.then(function (oauthData) {
-            if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token') {
+            if (provider.responseType === 'token' || provider.responseType === 'id_token token' || provider.responseType === 'token id_token') {
               return oauthData;
             }
             if (oauthData.state && oauthData.state !== _this5.storage.get(stateName)) {
@@ -762,6 +827,7 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
           this.auth0Lock = auth0Lock;
           this.updateTokenCallstack = [];
           this.accessToken = null;
+          this.idToken = null;
           this.refreshToken = null;
           this.payload = null;
           this.exp = null;
@@ -804,6 +870,7 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
           }
           this.accessToken = null;
           this.refreshToken = null;
+          this.idToken = null;
           this.payload = null;
           this.exp = null;
 
@@ -820,6 +887,11 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
         Authentication.prototype.getRefreshToken = function getRefreshToken() {
           if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
           return this.refreshToken;
+        };
+
+        Authentication.prototype.getIdToken = function getIdToken() {
+          if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+          return this.idToken;
         };
 
         Authentication.prototype.getPayload = function getPayload() {
@@ -862,8 +934,14 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
             }
           }
 
-          this.payload = null;
+          this.idToken = null;
+          try {
+            this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+          } catch (e) {
+            this.idToken = null;
+          }
 
+          this.payload = null;
           try {
             this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
           } catch (_) {
@@ -877,6 +955,7 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
           return {
             accessToken: this.accessToken,
             refreshToken: this.refreshToken,
+            idToken: this.idToken,
             payload: this.payload,
             exp: this.exp
           };
@@ -1078,6 +1157,10 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
 
         AuthService.prototype.getRefreshToken = function getRefreshToken() {
           return this.authentication.getRefreshToken();
+        };
+
+        AuthService.prototype.getIdToken = function getIdToken() {
+          return this.authentication.getIdToken();
         };
 
         AuthService.prototype.isAuthenticated = function isAuthenticated() {
@@ -1417,68 +1500,6 @@ System.register(['extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'aure
       }()) || _class13));
 
       _export('FetchConfig', FetchConfig);
-
-      function configure(aurelia, config) {
-        if (!PLATFORM.location.origin) {
-          PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
-        }
-
-        var baseConfig = aurelia.container.get(BaseConfig);
-
-        if (typeof config === 'function') {
-          config(baseConfig);
-        } else if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) === 'object') {
-          baseConfig.configure(config);
-        }
-
-        for (var _iterator = baseConfig.globalValueConverters, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-          var _ref;
-
-          if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-          } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-          }
-
-          var converter = _ref;
-
-          aurelia.globalResources('./' + converter);
-          LogManager.getLogger('authentication').info('Add globalResources value-converter: ' + converter);
-        }
-        var fetchConfig = aurelia.container.get(FetchConfig);
-        var clientConfig = aurelia.container.get(Config);
-
-        if (Array.isArray(baseConfig.configureEndpoints)) {
-          baseConfig.configureEndpoints.forEach(function (endpointToPatch) {
-            fetchConfig.configure(endpointToPatch);
-          });
-        }
-
-        var client = void 0;
-
-        if (baseConfig.endpoint !== null) {
-          if (typeof baseConfig.endpoint === 'string') {
-            var endpoint = clientConfig.getEndpoint(baseConfig.endpoint);
-            if (!endpoint) {
-              throw new Error('There is no \'' + (baseConfig.endpoint || 'default') + '\' endpoint registered.');
-            }
-            client = endpoint;
-          } else if (baseConfig.endpoint instanceof HttpClient) {
-            client = new Rest(baseConfig.endpoint);
-          }
-        }
-
-        if (!(client instanceof Rest)) {
-          client = new Rest(aurelia.container.get(HttpClient));
-        }
-
-        baseConfig.client = client;
-      }
-
-      _export('configure', configure);
     }
   };
 });

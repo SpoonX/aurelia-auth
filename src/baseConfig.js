@@ -128,6 +128,10 @@ export class BaseConfig {
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
   refreshTokenRoot = false;
 
+  idTokenProp = 'id_token';
+  idTokenName = 'token';
+  idTokenRoot = false;
+
 
   // Miscellaneous Options
   // =====================

@@ -192,6 +192,10 @@ export class AuthService {
     return this.authentication.getRefreshToken();
   }
 
+  getIdToken() {
+      return this.authentication.getIdToken();
+  }
+
  /**
   * Gets authentication status
   *
@@ -375,7 +379,7 @@ export class AuthService {
 
       resolve(response);
     });
-
+    
     return (this.config.logoutUrl
       ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout)
       : localLogout());

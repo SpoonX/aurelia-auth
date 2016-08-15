@@ -19,6 +19,7 @@ export class Authentication {
     this.auth0Lock            = auth0Lock;
     this.updateTokenCallstack = [];
     this.accessToken          = null;
+    this.idToken              = null;
     this.refreshToken         = null;
     this.payload              = null;
     this.exp                  = null;
@@ -82,6 +83,7 @@ export class Authentication {
     }
     this.accessToken = null;
     this.refreshToken = null;
+    this.idToken = null;
     this.payload = null;
     this.exp = null;
 
@@ -101,6 +103,11 @@ export class Authentication {
   getRefreshToken() {
     if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
+  }
+ 
+  getIdToken() {
+      if(!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+      return this.idToken;
   }
 
   getPayload() {
@@ -148,9 +155,15 @@ export class Authentication {
         this.refreshToken = null;
       }
     }
+    
+    this.idToken = null;
+    try {
+        this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch(e) {
+        this.idToken = null;
+    }
 
     this.payload = null;
-
     try {
       this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
     } catch (_) {_;}
@@ -162,6 +175,7 @@ export class Authentication {
     return {
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
+      idToken: this.idToken,
       payload: this.payload,
       exp: this.exp
     };

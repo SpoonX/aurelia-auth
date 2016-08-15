@@ -190,6 +190,9 @@ export let BaseConfig = class BaseConfig {
     this.refreshTokenProp = 'refresh_token';
     this.refreshTokenName = 'token';
     this.refreshTokenRoot = false;
+    this.idTokenProp = 'id_token';
+    this.idTokenName = 'token';
+    this.idTokenRoot = false;
     this.httpInterceptor = true;
     this.withCredentials = true;
     this.platform = 'browser';
@@ -585,7 +588,7 @@ export let OAuth2 = (_dec4 = inject(Storage, Popup, BaseConfig), _dec4(_class5 =
     const openPopup = this.config.platform === 'mobile' ? popup.eventListener(provider.redirectUri) : popup.pollPopup();
 
     return openPopup.then(oauthData => {
-      if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token') {
+      if (provider.responseType === 'token' || provider.responseType === 'id_token token' || provider.responseType === 'token id_token') {
         return oauthData;
       }
       if (oauthData.state && oauthData.state !== this.storage.get(stateName)) {
@@ -650,6 +653,7 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
     this.auth0Lock = auth0Lock;
     this.updateTokenCallstack = [];
     this.accessToken = null;
+    this.idToken = null;
     this.refreshToken = null;
     this.payload = null;
     this.exp = null;
@@ -702,6 +706,7 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
     }
     this.accessToken = null;
     this.refreshToken = null;
+    this.idToken = null;
     this.payload = null;
     this.exp = null;
 
@@ -718,6 +723,11 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
   getRefreshToken() {
     if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
+  }
+
+  getIdToken() {
+    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    return this.idToken;
   }
 
   getPayload() {
@@ -760,8 +770,14 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
       }
     }
 
-    this.payload = null;
+    this.idToken = null;
+    try {
+      this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch (e) {
+      this.idToken = null;
+    }
 
+    this.payload = null;
     try {
       this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
     } catch (_) {
@@ -775,6 +791,7 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
     return {
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
+      idToken: this.idToken,
       payload: this.payload,
       exp: this.exp
     };
@@ -953,6 +970,10 @@ export let AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
 
   getRefreshToken() {
     return this.authentication.getRefreshToken();
+  }
+
+  getIdToken() {
+    return this.authentication.getIdToken();
   }
 
   isAuthenticated() {
