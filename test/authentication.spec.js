@@ -101,6 +101,21 @@ describe('Authentication', () => {
     });
   });
 
+  describe('.getIdToken()', () => {
+    const container      = new Container();
+    const authentication = container.get(Authentication);
+
+    afterEach(() => {
+      authentication.setResponseObject(null);
+    });
+
+    it('Should analyze response first and return idToken', () => {
+      authentication.setResponseObject({access_token: 'some', id_token: 'another'});
+
+      expect(authentication.getIdToken()).toBe('another');
+    });
+  });
+
   describe('.getPayload()', () => {
     const container      = new Container();
     const authentication = container.get(Authentication);

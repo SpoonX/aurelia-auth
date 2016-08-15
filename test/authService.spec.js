@@ -453,6 +453,16 @@ describe('AuthService', () => {
     });
   });
 
+  describe('.getIdToken()', () => {
+    const container = getContainer();
+    const authService = container.get(AuthService);
+
+    it('should return authentication.idToken', () => {
+      authService.setResponseObject({token: 'some', id_token: 'another'});
+      expect(authService.getIdToken()).toBe('another');
+    });
+  });
+
   describe('.isAuthenticated()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
