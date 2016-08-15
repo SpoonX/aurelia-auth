@@ -253,6 +253,10 @@ export class BaseConfig {
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
   refreshTokenRoot = false;
 
+  idTokenProp = 'id_token';
+  idTokenName = 'token';
+  idTokenRoot = false;
+
 
   // Miscellaneous Options
   // =====================
@@ -667,8 +671,8 @@ export class OAuth2 {
     return openPopup
       .then(oauthData => {
         if (provider.responseType === 'token' ||
-            provider.responseType === 'id_token%20token' ||
-            provider.responseType === 'token%20id_token'
+            provider.responseType === 'id_token token' ||
+            provider.responseType === 'token id_token'
         ) {
           return oauthData;
         }
@@ -737,6 +741,7 @@ export class Authentication {
     this.auth0Lock            = auth0Lock;
     this.updateTokenCallstack = [];
     this.accessToken          = null;
+    this.idToken              = null;
     this.refreshToken         = null;
     this.payload              = null;
     this.exp                  = null;
@@ -800,6 +805,7 @@ export class Authentication {
     }
     this.accessToken = null;
     this.refreshToken = null;
+    this.idToken = null;
     this.payload = null;
     this.exp = null;
 
@@ -819,6 +825,11 @@ export class Authentication {
   getRefreshToken() {
     if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
+  }
+ 
+  getIdToken() {
+      if(!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+      return this.idToken;
   }
 
   getPayload() {
@@ -866,9 +877,15 @@ export class Authentication {
         this.refreshToken = null;
       }
     }
+    
+    this.idToken = null;
+    try {
+        this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch(e) {
+        this.idToken = null;
+    }
 
     this.payload = null;
-
     try {
       this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
     } catch (_) {_;}
@@ -880,6 +897,7 @@ export class Authentication {
     return {
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
+      idToken: this.idToken,
       payload: this.payload,
       exp: this.exp
     };
@@ -1155,6 +1173,10 @@ export class AuthService {
     return this.authentication.getRefreshToken();
   }
 
+  getIdToken() {
+      return this.authentication.getIdToken();
+  }
+
  /**
   * Gets authentication status
   *
@@ -1338,7 +1360,7 @@ export class AuthService {
 
       resolve(response);
     });
-
+    
     return (this.config.logoutUrl
       ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout)
       : localLogout());

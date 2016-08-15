@@ -136,6 +136,9 @@ export declare class BaseConfig {
   
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
   refreshTokenRoot: any;
+  idTokenProp: any;
+  idTokenName: any;
+  idTokenRoot: any;
   
   // Miscellaneous Options
   // =====================
@@ -208,6 +211,7 @@ export declare class Authentication {
   /* get data, update if needed first */
   getAccessToken(): any;
   getRefreshToken(): any;
+  getIdToken(): any;
   getPayload(): any;
   getExp(): any;
   
@@ -333,6 +337,7 @@ export declare class AuthService {
      * @returns {String} Current refreshToken
      */
   getRefreshToken(): any;
+  getIdToken(): any;
   
   /**
     * Gets authentication status

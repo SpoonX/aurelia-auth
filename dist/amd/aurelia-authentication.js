@@ -253,6 +253,9 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
       this.refreshTokenProp = 'refresh_token';
       this.refreshTokenName = 'token';
       this.refreshTokenRoot = false;
+      this.idTokenProp = 'id_token';
+      this.idTokenName = 'token';
+      this.idTokenRoot = false;
       this.httpInterceptor = true;
       this.withCredentials = true;
       this.platform = 'browser';
@@ -678,7 +681,7 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
       var openPopup = this.config.platform === 'mobile' ? popup.eventListener(provider.redirectUri) : popup.pollPopup();
 
       return openPopup.then(function (oauthData) {
-        if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token') {
+        if (provider.responseType === 'token' || provider.responseType === 'id_token token' || provider.responseType === 'token id_token') {
           return oauthData;
         }
         if (oauthData.state && oauthData.state !== _this5.storage.get(stateName)) {
@@ -750,6 +753,7 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
       this.auth0Lock = auth0Lock;
       this.updateTokenCallstack = [];
       this.accessToken = null;
+      this.idToken = null;
       this.refreshToken = null;
       this.payload = null;
       this.exp = null;
@@ -792,6 +796,7 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
       }
       this.accessToken = null;
       this.refreshToken = null;
+      this.idToken = null;
       this.payload = null;
       this.exp = null;
 
@@ -808,6 +813,11 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
     Authentication.prototype.getRefreshToken = function getRefreshToken() {
       if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
       return this.refreshToken;
+    };
+
+    Authentication.prototype.getIdToken = function getIdToken() {
+      if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+      return this.idToken;
     };
 
     Authentication.prototype.getPayload = function getPayload() {
@@ -850,8 +860,14 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
         }
       }
 
-      this.payload = null;
+      this.idToken = null;
+      try {
+        this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+      } catch (e) {
+        this.idToken = null;
+      }
 
+      this.payload = null;
       try {
         this.payload = this.accessToken ? (0, _jwtDecode2.default)(this.accessToken) : null;
       } catch (_) {
@@ -865,6 +881,7 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
       return {
         accessToken: this.accessToken,
         refreshToken: this.refreshToken,
+        idToken: this.idToken,
         payload: this.payload,
         exp: this.exp
       };
@@ -1063,6 +1080,10 @@ define(['exports', 'extend', 'aurelia-logging', 'jwt-decode', 'aurelia-pal', 'au
 
     AuthService.prototype.getRefreshToken = function getRefreshToken() {
       return this.authentication.getRefreshToken();
+    };
+
+    AuthService.prototype.getIdToken = function getIdToken() {
+      return this.authentication.getIdToken();
     };
 
     AuthService.prototype.isAuthenticated = function isAuthenticated() {

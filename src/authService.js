@@ -192,6 +192,10 @@ export class AuthService {
     return this.authentication.getRefreshToken();
   }
 
+  getIdToken() {
+    return this.authentication.getIdToken();
+  }
+
  /**
   * Gets authentication status
   *

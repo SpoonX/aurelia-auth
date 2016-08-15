@@ -238,6 +238,9 @@ var BaseConfig = exports.BaseConfig = function () {
     this.refreshTokenProp = 'refresh_token';
     this.refreshTokenName = 'token';
     this.refreshTokenRoot = false;
+    this.idTokenProp = 'id_token';
+    this.idTokenName = 'token';
+    this.idTokenRoot = false;
     this.httpInterceptor = true;
     this.withCredentials = true;
     this.platform = 'browser';
@@ -663,7 +666,7 @@ var OAuth2 = exports.OAuth2 = (_dec4 = (0, _aureliaDependencyInjection.inject)(S
     var openPopup = this.config.platform === 'mobile' ? popup.eventListener(provider.redirectUri) : popup.pollPopup();
 
     return openPopup.then(function (oauthData) {
-      if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token') {
+      if (provider.responseType === 'token' || provider.responseType === 'id_token token' || provider.responseType === 'token id_token') {
         return oauthData;
       }
       if (oauthData.state && oauthData.state !== _this5.storage.get(stateName)) {
@@ -735,6 +738,7 @@ var Authentication = exports.Authentication = (_dec5 = (0, _aureliaDependencyInj
     this.auth0Lock = auth0Lock;
     this.updateTokenCallstack = [];
     this.accessToken = null;
+    this.idToken = null;
     this.refreshToken = null;
     this.payload = null;
     this.exp = null;
@@ -777,6 +781,7 @@ var Authentication = exports.Authentication = (_dec5 = (0, _aureliaDependencyInj
     }
     this.accessToken = null;
     this.refreshToken = null;
+    this.idToken = null;
     this.payload = null;
     this.exp = null;
 
@@ -793,6 +798,11 @@ var Authentication = exports.Authentication = (_dec5 = (0, _aureliaDependencyInj
   Authentication.prototype.getRefreshToken = function getRefreshToken() {
     if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
+  };
+
+  Authentication.prototype.getIdToken = function getIdToken() {
+    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    return this.idToken;
   };
 
   Authentication.prototype.getPayload = function getPayload() {
@@ -835,8 +845,14 @@ var Authentication = exports.Authentication = (_dec5 = (0, _aureliaDependencyInj
       }
     }
 
-    this.payload = null;
+    this.idToken = null;
+    try {
+      this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch (e) {
+      this.idToken = null;
+    }
 
+    this.payload = null;
     try {
       this.payload = this.accessToken ? (0, _jwtDecode2.default)(this.accessToken) : null;
     } catch (_) {
@@ -850,6 +866,7 @@ var Authentication = exports.Authentication = (_dec5 = (0, _aureliaDependencyInj
     return {
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
+      idToken: this.idToken,
       payload: this.payload,
       exp: this.exp
     };
@@ -1048,6 +1065,10 @@ var AuthService = exports.AuthService = (_dec12 = (0, _aureliaDependencyInjectio
 
   AuthService.prototype.getRefreshToken = function getRefreshToken() {
     return this.authentication.getRefreshToken();
+  };
+
+  AuthService.prototype.getIdToken = function getIdToken() {
+    return this.authentication.getIdToken();
   };
 
   AuthService.prototype.isAuthenticated = function isAuthenticated() {
