@@ -104,10 +104,10 @@ export class Authentication {
     if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
   }
- 
+
   getIdToken() {
-      if(!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
-      return this.idToken;
+    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    return this.idToken;
   }
 
   getPayload() {
@@ -155,12 +155,12 @@ export class Authentication {
         this.refreshToken = null;
       }
     }
-    
+
     this.idToken = null;
     try {
-        this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
-    } catch(e) {
-        this.idToken = null;
+      this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch (e) {
+      this.idToken = null;
     }
 
     this.payload = null;
