@@ -70,6 +70,11 @@ export class Authentication {
     this.setResponseObject(response);
   }
 
+  get hasDataStored() {
+    LogManager.getLogger('authentication').warn('Authentication.hasDataStored is deprecated. Use Authentication.responseAnalyzed instead.');
+    return this.getResponseObject();
+  }
+
   /* get/set responseObject */
 
   getResponseObject() {
