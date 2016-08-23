@@ -183,9 +183,10 @@ export class BaseConfig {
   loginOnSignup = true;
   // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup (else loginRedirect is used)
   signupRedirect = '#/login';
-  // redirect  when token expires. 0 = don't redirect (default), 1 = use logoutRedirect, string = redirect there
-  expiredRedirect = 0;
-
+  // The SPA url to load when the token expires
+  expiredRedirect = '#/';
+  // The SPA url to load when the authentication status changed in other tabs/windows (detected through storageEvents)
+  storageChangedRedirect = '#/';
 
   // API related options
   // ===================
@@ -253,6 +254,12 @@ export class BaseConfig {
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
   refreshTokenRoot = false;
 
+  // The property name from which to get the user authentication token. Can also be dotted idTokenProp.idTokenName
+  idTokenProp = 'id_token';
+  // This is the property from which to get the id token `{ "idTokenProp": { "idTokenName" : '...' } }`
+  idTokenName = 'token';
+  // This allows the id_token to be a further object deeper `{ "idTokenProp": { "idTokenRoot" : { "idTokenName" : '...' } } }`
+  idTokenRoot = false;
 
   // Miscellaneous Options
   // =====================
@@ -268,6 +275,15 @@ export class BaseConfig {
   storage = 'localStorage';
   // The key used for storing the authentication response locally
   storageKey = 'aurelia_authentication';
+  // optional function to extract the expiration date. takes the server response as parameter
+  // eg (expires_in in sec): getExpirationDateFromResponse = serverResponse => new Date().getTime() + serverResponse.expires_in * 1000;
+  getExpirationDateFromResponse = null;
+  // optional function to extract the access token from the response. takes the server response as parameter
+  // eg: getAccessTokenFromResponse = serverResponse => serverResponse.data[0].access_token;
+  getAccessTokenFromResponse = null;
+  // optional function to extract the refresh token from the response. takes the server response as parameter
+  // eg: getRefreshTokenFromResponse = serverResponse => serverResponse.data[0].refresh_token;
+  getRefreshTokenFromResponse = null;
 
   // List of value-converters to make global
   globalValueConverters = ['authFilterValueConverter'];
@@ -403,13 +419,31 @@ export class BaseConfig {
   };
 
   /* deprecated defaults */
+  /**
+   * @deprecated
+   */
   _authToken = 'Bearer';
+  /**
+   * @deprecated
+   */
   _responseTokenProp = 'access_token';
+  /**
+   * @deprecated
+   */
   _tokenName = 'token';
+  /**
+   * @deprecated
+   */
   _tokenRoot = false;
+  /**
+   * @deprecated
+   */
   _tokenPrefix = 'aurelia';
 
   /* deprecated methods and parameteres */
+  /**
+   * @deprecated
+   */
   set authToken(authToken) {
     LogManager.getLogger('authentication').warn('BaseConfig.authToken is deprecated. Use BaseConfig.authTokenType instead.');
     this._authTokenType = authToken;
@@ -420,6 +454,9 @@ export class BaseConfig {
     return this._authTokenType;
   }
 
+  /**
+   * @deprecated
+   */
   set responseTokenProp(responseTokenProp) {
     LogManager.getLogger('authentication').warn('BaseConfig.responseTokenProp is deprecated. Use BaseConfig.accessTokenProp instead.');
     this._responseTokenProp = responseTokenProp;
@@ -430,6 +467,9 @@ export class BaseConfig {
     return this._responseTokenProp;
   }
 
+  /**
+   * @deprecated
+   */
   set tokenRoot(tokenRoot) {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenRoot is deprecated. Use BaseConfig.accessTokenRoot instead.');
     this._tokenRoot = tokenRoot;
@@ -440,6 +480,9 @@ export class BaseConfig {
     return this._tokenRoot;
   }
 
+  /**
+   * @deprecated
+   */
   set tokenName(tokenName) {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenName is deprecated. Use BaseConfig.accessTokenName instead.');
     this._tokenName = tokenName;
@@ -450,6 +493,9 @@ export class BaseConfig {
     return this._tokenName;
   }
 
+  /**
+   * @deprecated
+   */
   set tokenPrefix(tokenPrefix) {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenPrefix is obsolete. Use BaseConfig.storageKey instead.');
     this._tokenPrefix = tokenPrefix;
@@ -459,20 +505,26 @@ export class BaseConfig {
     return this._tokenPrefix || 'aurelia';
   }
 
+  /**
+   * @deprecated
+   */
   get current() {
     LogManager.getLogger('authentication').warn('Getter BaseConfig.current is deprecated. Use BaseConfig directly instead.');
     return this;
   }
   set current(_) {
-    throw new Error('Setter BaseConfig.current is obsolete. Use BaseConfig directly instead.');
+    throw new Error('Setter BaseConfig.current has been removed. Use BaseConfig directly instead.');
   }
 
+  /**
+   * @deprecated
+   */
   get _current() {
     LogManager.getLogger('authentication').warn('Getter BaseConfig._current is deprecated. Use BaseConfig directly instead.');
     return this;
   }
   set _current(_) {
-    throw new Error('Setter BaseConfig._current is obsolete. Use BaseConfig directly instead.');
+    throw new Error('Setter BaseConfig._current has been removed. Use BaseConfig directly instead.');
   }
 }
 
@@ -667,8 +719,8 @@ export class OAuth2 {
     return openPopup
       .then(oauthData => {
         if (provider.responseType === 'token' ||
-            provider.responseType === 'id_token%20token' ||
-            provider.responseType === 'token%20id_token'
+            provider.responseType === 'id_token token' ||
+            provider.responseType === 'token id_token'
         ) {
           return oauthData;
         }
@@ -738,9 +790,10 @@ export class Authentication {
     this.updateTokenCallstack = [];
     this.accessToken          = null;
     this.refreshToken         = null;
+    this.idToken              = null;
     this.payload              = null;
     this.exp                  = null;
-    this.hasDataStored        = false;
+    this.responseAnalyzed     = false;
   }
 
 
@@ -786,6 +839,11 @@ export class Authentication {
     this.setResponseObject(response);
   }
 
+  get hasDataStored() {
+    LogManager.getLogger('authentication').warn('Authentication.hasDataStored is deprecated. Use Authentication.responseAnalyzed instead.');
+    return this.getResponseObject();
+  }
+
   /* get/set responseObject */
 
   getResponseObject() {
@@ -798,12 +856,12 @@ export class Authentication {
       this.storage.set(this.config.storageKey, JSON.stringify(response));
       return;
     }
-    this.accessToken = null;
-    this.refreshToken = null;
-    this.payload = null;
-    this.exp = null;
-
-    this.hasDataStored = false;
+    this.accessToken      = null;
+    this.refreshToken     = null;
+    this.idToken          = null;
+    this.payload          = null;
+    this.exp              = null;
+    this.responseAnalyzed = false;
 
     this.storage.remove(this.config.storageKey);
   }
@@ -812,22 +870,27 @@ export class Authentication {
   /* get data, update if needed first */
 
   getAccessToken() {
-    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
     return this.accessToken;
   }
 
   getRefreshToken() {
-    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
     return this.refreshToken;
   }
 
+  getIdToken() {
+    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    return this.idToken;
+  }
+
   getPayload() {
-    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
     return this.payload;
   }
 
   getExp() {
-    if (!this.hasDataStored) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
     return this.exp;
   }
 
@@ -856,30 +919,49 @@ export class Authentication {
   getDataFromResponse(response) {
     const config   = this.config;
 
-    this.accessToken = this.getTokenFromResponse(response, config.accessTokenProp, config.accessTokenName, config.accessTokenRoot);
+    // get access token either with from supplied parameters or with supplied function
+    this.accessToken = typeof this.config.getAccessTokenFromResponse === 'function'
+                     ? this.config.getAccessTokenFromResponse(response)
+                     : this.getTokenFromResponse(response, config.accessTokenProp, config.accessTokenName, config.accessTokenRoot);
+
 
     this.refreshToken = null;
     if (config.useRefreshToken) {
       try {
-        this.refreshToken = this.getTokenFromResponse(response, config.refreshTokenProp, config.refreshTokenName, config.refreshTokenRoot);
+        // get refresh token either with from supplied parameters or with supplied function
+        this.refreshToken = typeof this.config.getRefreshTokenFromResponse === 'function'
+                         ? this.config.getRefreshTokenFromResponse(response)
+                         : this.getTokenFromResponse(response, config.refreshTokenProp, config.refreshTokenName, config.refreshTokenRoot);
       } catch (e) {
         this.refreshToken = null;
+
+        LogManager.getLogger('authentication').warn('useRefreshToken is set, but could not extract a refresh token');
       }
     }
 
-    this.payload = null;
+    this.idToken = null;
+    try {
+      this.idToken = this.getTokenFromResponse(response, config.idTokenProp, config.idTokenName, config.idTokenRoot);
+    } catch (e) {
+      this.idToken = null;
+    }
 
+    this.payload = null;
     try {
       this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
     } catch (_) {_;}
 
-    this.exp = this.payload ? parseInt(this.payload.exp, 10) : NaN;
+    // get exp either with from jwt or with supplied function
+    this.exp = typeof this.config.getExpirationDateFromResponse === 'function'
+            ? this.config.getExpirationDateFromResponse(response)
+            : (this.payload && parseInt(this.payload.exp, 10)) ||  NaN;
 
-    this.hasDataStored = true;
+    this.responseAnalyzed = true;
 
     return {
       accessToken: this.accessToken,
       refreshToken: this.refreshToken,
+      idToken: this.idToken,
       payload: this.payload,
       exp: this.exp
     };
@@ -948,7 +1030,7 @@ export class Authentication {
     return providerLogin.open(this.config.providers[name], userData);
   }
 
-  redirect(redirectUrl, defaultRedirectUrl) {
+  redirect(redirectUrl, defaultRedirectUrl, query) {
     // stupid rule to keep it BC
     if (redirectUrl === true) {
       LogManager.getLogger('authentication').warn('DEPRECATED: Setting redirectUrl === true to actually *not redirect* is deprecated. Set redirectUrl === 0 instead.');
@@ -963,9 +1045,9 @@ export class Authentication {
       return;
     }
     if (typeof redirectUrl === 'string') {
-      PLATFORM.location.href = encodeURI(redirectUrl);
+      PLATFORM.location.href = encodeURI(redirectUrl + (query ? `?${buildQueryString(query)}` : ''));
     } else if (defaultRedirectUrl) {
-      PLATFORM.location.href = defaultRedirectUrl;
+      PLATFORM.location.href = defaultRedirectUrl + (query ? `?${buildQueryString(query)}` : '');
     }
   }
 }
@@ -1016,7 +1098,7 @@ export class AuthService {
 
     // get token stored in previous format over
     const oldStorageKey = config.tokenPrefix
-                        ? config.tokenPrefix + '_' + config.tokenName
+                        ? `${config.tokenPrefix}_${config.tokenName}`
                         : config.tokenName;
     const oldToken = authentication.storage.get(oldStorageKey);
 
@@ -1030,7 +1112,32 @@ export class AuthService {
 
     // initialize status by resetting if existing stored responseObject
     this.setResponseObject(this.authentication.getResponseObject());
+
+    // listen to storage events in case the user logs in or out in another tab/window
+    PLATFORM.addEventListener('storage', this.storageEventHandler);
   }
+
+  /**
+   * The handler used for storage events. Detects and handles authentication changes in other tabs/windows
+   *
+   * @param {StorageEvent}
+   */
+  storageEventHandler = event => {
+    if (event.key !== this.config.storageKey) {
+      return;
+    }
+
+    LogManager.getLogger('authentication').info('Stored token changed event');
+
+    let wasAuthenticated = this.authenticated;
+    this.authentication.responseAnalyzed = false;
+    this.updateAuthenticated();
+
+    if (this.config.storageChangedRedirect && wasAuthenticated !== this.authenticated) {
+      PLATFORM.location.assign(this.config.storageChangedRedirect);
+    }
+  }
+
 
   /**
    * Getter: The configured client for all aurelia-authentication requests
@@ -1041,6 +1148,12 @@ export class AuthService {
     return this.config.client;
   }
 
+  /**
+   * Getter: The authentication class instance
+   *
+   * @return {boolean}
+   * @deprecated
+   */
   get auth() {
     LogManager.getLogger('authentication').warn('AuthService.auth is deprecated. Use .authentication instead.');
     return this.authentication;
@@ -1059,8 +1172,14 @@ export class AuthService {
         && this.authentication.getAccessToken()
         && this.authentication.getRefreshToken()) {
         this.updateToken();
-      } else {
-        this.logout(this.config.expiredRedirect);
+
+        return;
+      }
+
+      this.setResponseObject(null);
+
+      if (this.config.expiredRedirect) {
+        PLATFORM.location.assign(this.config.expiredRedirect);
       }
     }, ttl);
   }
@@ -1081,9 +1200,16 @@ export class AuthService {
    * @param {Object} response The servers response as GOJO
    */
   setResponseObject(response) {
-    this.clearTimeout();
-
     this.authentication.setResponseObject(response);
+
+    this.updateAuthenticated();
+  }
+
+  /**
+   * Update authenticated. Sets login status and timeout
+   */
+  updateAuthenticated() {
+    this.clearTimeout();
 
     let wasAuthenticated = this.authenticated;
     this.authenticated = this.authentication.isAuthenticated();
@@ -1155,12 +1281,23 @@ export class AuthService {
     return this.authentication.getRefreshToken();
   }
 
+  /**
+   * Get idToken from storage
+   *
+   * @returns {String} Current idToken
+   */
+  getIdToken() {
+    return this.authentication.getIdToken();
+  }
+
  /**
-  * Gets authentication status
+  * Gets authentication status from storage
   *
   * @returns {Boolean} For Non-JWT and unexpired JWT: true, else: false
   */
   isAuthenticated() {
+    this.authentication.responseAnalyzed = false;
+
     let authenticated = this.authentication.isAuthenticated();
 
     // auto-update token?
@@ -1259,8 +1396,8 @@ export class AuthService {
     let content;
 
     if (typeof arguments[0] === 'object') {
-      content = arguments[0];
-      options = arguments[1];
+      content     = arguments[0];
+      options     = arguments[1];
       redirectUri = arguments[2];
     } else {
       content = {
@@ -1294,9 +1431,9 @@ export class AuthService {
     let content;
 
     if (typeof arguments[0] === 'object') {
-      content             = arguments[0];
+      content              = arguments[0];
       optionsOrRedirectUri = arguments[1];
-      redirectUri         = arguments[2];
+      redirectUri          = arguments[2];
     } else {
       content = {
         'email': emailOrCredentials,
@@ -1322,15 +1459,15 @@ export class AuthService {
   /**
    * logout locally and redirect to redirectUri (if set) or redirectUri of config. Sends logout request first, if set in config
    *
-   * @param {[String]}    [redirectUri]                      [optional redirectUri overwrite]
+   * @param {[String]}    [redirectUri]                     [optional redirectUri overwrite]
    *
    * @return {Promise<>|Promise<Object>|Promise<Error>}     Server response as Object
    */
-  logout(redirectUri) {
+  logout(redirectUri, query) {
     let localLogout = response => new Promise(resolve => {
       this.setResponseObject(null);
 
-      this.authentication.redirect(redirectUri, this.config.logoutRedirect);
+      this.authentication.redirect(redirectUri, this.config.logoutRedirect, query);
 
       if (typeof this.onLogout === 'function') {
         this.onLogout(response);

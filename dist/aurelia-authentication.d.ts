@@ -60,8 +60,11 @@ export declare class BaseConfig {
   // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup (else loginRedirect is used)
   signupRedirect: any;
   
-  // redirect  when token expires. 0 = don't redirect (default), 1 = use logoutRedirect, string = redirect there
+  // The SPA url to load when the token expires
   expiredRedirect: any;
+  
+  // The SPA url to load when the authentication status changed in other tabs/windows (detected through storageEvents)
+  storageChangedRedirect: any;
   
   // API related options
   // ===================
@@ -137,6 +140,15 @@ export declare class BaseConfig {
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
   refreshTokenRoot: any;
   
+  // The property name from which to get the user authentication token. Can also be dotted idTokenProp.idTokenName
+  idTokenProp: any;
+  
+  // This is the property from which to get the id token `{ "idTokenProp": { "idTokenName" : '...' } }`
+  idTokenName: any;
+  
+  // This allows the id_token to be a further object deeper `{ "idTokenProp": { "idTokenRoot" : { "idTokenName" : '...' } } }`
+  idTokenRoot: any;
+  
   // Miscellaneous Options
   // =====================
   // Whether to enable the fetch interceptor which automatically adds the authentication headers
@@ -155,6 +167,18 @@ export declare class BaseConfig {
   // The key used for storing the authentication response locally
   storageKey: any;
   
+  // optional function to extract the expiration date. takes the server response as parameter
+  // eg (expires_in in sec): getExpirationDateFromResponse = serverResponse => new Date().getTime() + serverResponse.expires_in * 1000;
+  getExpirationDateFromResponse: any;
+  
+  // optional function to extract the access token from the response. takes the server response as parameter
+  // eg: getAccessTokenFromResponse = serverResponse => serverResponse.data[0].access_token;
+  getAccessTokenFromResponse: any;
+  
+  // optional function to extract the refresh token from the response. takes the server response as parameter
+  // eg: getRefreshTokenFromResponse = serverResponse => serverResponse.data[0].refresh_token;
+  getRefreshTokenFromResponse: any;
+  
   // List of value-converters to make global
   globalValueConverters: any;
   
@@ -166,6 +190,10 @@ export declare class BaseConfig {
   tokenRoot: any;
   tokenName: any;
   tokenPrefix: any;
+  
+  /**
+     * @deprecated
+     */
   current: any;
 }
 export declare class Storage {
@@ -200,6 +228,7 @@ export declare class Authentication {
   getProfileUrl(): any;
   getToken(): any;
   responseObject: any;
+  hasDataStored: any;
   
   /* get/set responseObject */
   getResponseObject(): any;
@@ -208,6 +237,7 @@ export declare class Authentication {
   /* get data, update if needed first */
   getAccessToken(): any;
   getRefreshToken(): any;
+  getIdToken(): any;
   getPayload(): any;
   getExp(): any;
   
@@ -231,7 +261,7 @@ export declare class Authentication {
      * @return {Promise<response>}
      */
   authenticate(name?: any, userData?: any): any;
-  redirect(redirectUrl?: any, defaultRedirectUrl?: any): any;
+  redirect(redirectUrl?: any, defaultRedirectUrl?: any, query?: any): any;
 }
 export declare class AuthService {
   
@@ -274,11 +304,25 @@ export declare class AuthService {
   constructor(authentication?: any, config?: any, bindingSignaler?: any, eventAggregator?: any);
   
   /**
+     * The handler used for storage events. Detects and handles authentication changes in other tabs/windows
+     *
+     * @param {StorageEvent}
+     */
+  storageEventHandler: any;
+  
+  /**
      * Getter: The configured client for all aurelia-authentication requests
      *
      * @return {HttpClient}
      */
   client: any;
+  
+  /**
+     * Getter: The authentication class instance
+     *
+     * @return {boolean}
+     * @deprecated
+     */
   auth: any;
   
   /**
@@ -299,6 +343,11 @@ export declare class AuthService {
      * @param {Object} response The servers response as GOJO
      */
   setResponseObject(response?: any): any;
+  
+  /**
+     * Update authenticated. Sets login status and timeout
+     */
+  updateAuthenticated(): any;
   
   /**
      * Get current user profile from server
@@ -335,7 +384,14 @@ export declare class AuthService {
   getRefreshToken(): any;
   
   /**
-    * Gets authentication status
+     * Get idToken from storage
+     *
+     * @returns {String} Current idToken
+     */
+  getIdToken(): any;
+  
+  /**
+    * Gets authentication status from storage
     *
     * @returns {Boolean} For Non-JWT and unexpired JWT: true, else: false
     */
@@ -404,11 +460,11 @@ export declare class AuthService {
   /**
      * logout locally and redirect to redirectUri (if set) or redirectUri of config. Sends logout request first, if set in config
      *
-     * @param {[String]}    [redirectUri]                      [optional redirectUri overwrite]
+     * @param {[String]}    [redirectUri]                     [optional redirectUri overwrite]
      *
      * @return {Promise<>|Promise<Object>|Promise<Error>}     Server response as Object
      */
-  logout(redirectUri?: any): any;
+  logout(redirectUri?: any, query?: any): any;
   
   /**
      * Authenticate with third-party and redirect to redirectUri (if set) or redirectUri of config
