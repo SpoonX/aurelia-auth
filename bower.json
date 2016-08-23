@@ -1,6 +1,6 @@
 {
   "name": "aurelia-authentication",
-  "version": "3.0.0-rc8",
+  "version": "3.0.0-rc9",
   "description": "Plugin for social media authentication and local authentication together with other authentication utilities.",
   "keywords": [
     "aurelia",
