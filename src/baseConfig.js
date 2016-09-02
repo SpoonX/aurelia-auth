@@ -2,8 +2,16 @@ import {PLATFORM} from 'aurelia-pal';
 import {join} from 'aurelia-path';
 import extend from 'extend';
 import * as LogManager from 'aurelia-logging';
+import {inject, Container} from 'aurelia-dependency-injection';
+import {Config as ClientConfig, Rest} from 'aurelia-api';
+import {HttpClient} from 'aurelia-fetch-client';
 
+@inject(Container)
 export class BaseConfig {
+  constructor(container) {
+    this.container = container;
+  }
+
   /**
    * Prepends baseUrl to a given url
    * @param  {String} url The relative url to append
@@ -14,13 +22,13 @@ export class BaseConfig {
   }
 
   /**
-   * Merge current settings with incomming settings
+   * Merge current settings with incomming settings and set the client
    * @param  {Object} incomming Settings object to be merged into the current configuration
    * @return {Config}           this
    */
   configure(incomming) {
     for (let key in incomming) {
-      const value = incomming[key];
+      let value = incomming[key];
       if (value !== undefined) {
         if (Array.isArray(value) || typeof value !== 'object' || value === null) {
           this[key] = value;
@@ -29,6 +37,26 @@ export class BaseConfig {
         }
       }
     }
+
+    // Let's see if there's a configured named or default endpoint or a HttpClient.
+    if (this.endpoint !== null) {
+      if (typeof this.endpoint === 'string') {
+        let endpoint = this.container.get(ClientConfig).getEndpoint(this.endpoint);
+        if (!endpoint) {
+          throw new Error(`There is no '${this.endpoint || 'default'}' endpoint registered.`);
+        }
+        this.client = endpoint;
+      } else if (this.endpoint instanceof HttpClient) {
+        this.client = new Rest(this.endpoint, 'instance');
+      }
+    }
+
+    // No? Fine. Default to HttpClient. BC all the way.
+    if (!(this.client instanceof Rest)) {
+      this.client = new Rest(this.container.get(HttpClient), 'singleton');
+    }
+
+    return this;
   }
 
   /* ----------- default  config ----------- */

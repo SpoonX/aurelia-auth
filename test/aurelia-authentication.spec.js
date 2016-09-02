@@ -123,6 +123,7 @@ describe('aurelia-authentication', function() {
 
       expect(baseConfig.endpoint).toEqual('sx/custom');
       expect(baseConfig.client).toBe(clientConfig.getEndpoint('sx/custom'));
+      expect(baseConfig.client.endpoint).toBe('sx/custom');
     });
 
     it('Should set the default endpoint as a client.', function() {
@@ -134,6 +135,19 @@ describe('aurelia-authentication', function() {
 
       expect(baseConfig.endpoint).toEqual('');
       expect(baseConfig.client).toBe(clientConfig.getEndpoint('sx/default'));
+      expect(baseConfig.client.endpoint).toBe('sx/default');
+    });
+
+    it('Should set provided HttpClient instance as a client.', function() {
+      let container  = new Container();
+      let baseConfig = container.get(BaseConfig);
+      baseConfig.endpoint = new HttpClient;
+
+      configure({container: container, globalResources: noop}, {});
+
+      expect(baseConfig.client instanceof Rest).toBe(true);
+      expect(baseConfig.client.client).toBe(baseConfig.endpoint);
+      expect(baseConfig.client.endpoint).toBe('instance');
     });
 
     it('Should set the default HttpClient as client if no endpoint was supplied.', function() {
@@ -145,6 +159,7 @@ describe('aurelia-authentication', function() {
       expect(baseConfig.endpoint).toEqual(null);
       expect(baseConfig.client instanceof Rest).toBe(true);
       expect(baseConfig.client.client).toBe(container.get(HttpClient));
+      expect(baseConfig.client.endpoint).toBe('singleton');
     });
   });
 });
