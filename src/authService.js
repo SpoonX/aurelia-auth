@@ -361,6 +361,7 @@ export class AuthService {
         'password': passwordOrRedirectUri
       };
     }
+
     return this.client.post(this.config.joinBase(this.config.signupUrl), content, options)
       .then(response => {
         if (this.config.loginOnSignup) {

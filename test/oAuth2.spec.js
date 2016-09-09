@@ -1,5 +1,6 @@
 import {Container} from 'aurelia-dependency-injection';
 import {Config} from 'aurelia-api';
+import extend from 'extend';
 
 import {configure} from '../src/aurelia-authentication';
 import {BaseConfig} from '../src/baseConfig';
@@ -52,7 +53,7 @@ describe('OAuth2', () => {
       return popup;
     },
     eventListener: ()=>{},
-    pollPopup: () => Promise.resolve({access_token: 'someToken'}),
+    pollPopup: () => Promise.resolve({code: 'someToken'}),
     popupWindow: {location: null}
   };
   const oAuth2 = new OAuth2(storage, popup, baseConfig);
@@ -60,7 +61,7 @@ describe('OAuth2', () => {
   describe('.exchangeForToken()', () => {
     it('fails with defaults', done => {
       oAuth2.exchangeForToken(
-        {access_token: 'someToken'},
+        {code: 'someToken'},
         {userData: 'some'},
         baseConfig.providers.facebook
       ).then(res => {
@@ -77,13 +78,13 @@ describe('OAuth2', () => {
     it('not fails with withCredentials = false', done => {
       baseConfig.withCredentials = false;
       oAuth2.exchangeForToken(
-        {access_token: 'someToken'},
+        {code: 'someToken'},
         {userData: 'some'},
-        baseConfig.providers.facebook
+         extend({}, oAuth2.defaults, baseConfig.providers.facebook)
       ).then(res => {
         expect(res).toBeDefined();
         expect(res.path).toBe('/auth/facebook');
-        expect(res.body.access_token).toBe('someToken');
+        expect(res.body.code).toBe('someToken');
         expect(res.body.userData).toBe('some');
 
         done();
@@ -99,10 +100,10 @@ describe('OAuth2', () => {
     it('not fails with withCredentials = false', done => {
       baseConfig.withCredentials = false;
       oAuth2.open(baseConfig.providers.facebook, {userData: 'some'})
-        .then(res=>{
+        .then(res => {
           expect(res).toBeDefined();
           expect(res.path).toBe('/auth/facebook');
-          expect(res.body.access_token).toBe('someToken');
+          expect(res.body.code).toBe('someToken');
           expect(res.body.userData).toBe('some');
           expect(popup.url).toBe('https://www.facebook.com/v2.5/dialog/oauth?display=popup&redirect_uri=http%3A%2F%2Flocalhost%3A9876%2F&response_type=code&scope=email');
 

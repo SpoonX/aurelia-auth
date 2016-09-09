@@ -4,9 +4,9 @@ import extend from 'extend';
 
 export class Popup {
   constructor() {
-    this.popupWindow = null;
-    this.polling     = null;
-    this.url         = '';
+    this.popupWindow   = null;
+    this.polling = null;
+    this.url     = '';
   }
 
   open(url, windowName, options) {
@@ -29,69 +29,65 @@ export class Popup {
           return;
         }
 
-        const parser  = DOM.createElement('a');
+        const parser = DOM.createElement('a');
         parser.href = event.url;
 
         if (parser.search || parser.hash) {
-          const qs = parseUrl(parser);
-
-          if (qs.error) {
-            reject({error: qs.error});
-          } else {
-            resolve(qs);
-          }
-
           this.popupWindow.close();
+
+          const params = parseUrl(parser);
+
+          return params.error ? reject(new Error(params.error)) : resolve(params);
         }
       });
 
       this.popupWindow.addEventListener('exit', () => {
-        reject({data: 'Provider Popup was closed'});
+        reject(new Error('Provider Popup was closed'));
       });
 
       this.popupWindow.addEventListener('loaderror', () => {
-        reject({data: 'Authorization Failed'});
+        reject(new Error('Authorization Failed'));
       });
     });
   }
 
-  pollPopup() {
+  pollPopup(redirectUri) {
     return new Promise((resolve, reject) => {
+      const redirectUriParser = DOM.createElement('a');
+      redirectUriParser.href  = redirectUri;
+      const redirectUriPath   = getFullUrlPath(redirectUriParser);
+
       this.polling = PLATFORM.global.setInterval(() => {
-        let errorData;
+        if (!this.popupWindow || this.popupWindow.closed || this.popupWindow.closed === undefined) {
+          PLATFORM.global.clearInterval(this.polling);
+
+          return reject(new Error('The popup window was closed'));
+        }
 
         try {
-          if (this.popupWindow.location.host ===  PLATFORM.global.document.location.host
-            && (this.popupWindow.location.search || this.popupWindow.location.hash)) {
-            const qs = parseUrl(this.popupWindow.location);
+          const popupWindowPath = getFullUrlPath(this.popupWindow.location);
 
-            if (qs.error) {
-              reject({error: qs.error});
-            } else {
-              resolve(qs);
-            }
-
+          if (popupWindowPath === redirectUriPath) {
             this.popupWindow.close();
             PLATFORM.global.clearInterval(this.polling);
-          }
-        } catch (error) {
-          errorData = error;
-        }
 
-        if (!this.popupWindow) {
-          PLATFORM.global.clearInterval(this.polling);
-          reject({
-            error: errorData,
-            data: 'Provider Popup Blocked'
-          });
-        } else if (this.popupWindow.closed) {
-          PLATFORM.global.clearInterval(this.polling);
-          reject({
-            error: errorData,
-            data: 'Problem poll popup'
-          });
+            if (this.popupWindow.location.search || this.popupWindow.location.hash) {
+              const params = parseUrl(this.popupWindow.location);
+
+              return params.error ? reject(new Error(params.error)) : resolve(params);
+            }
+
+            return reject(new Error(
+              'OAuth redirect has occurred but no query or hash parameters were found. ' +
+              'They were either not set during the redirect, or were removed—typically by a ' +
+              'routing library..'
+            ));
+          }
+        } catch (_) {
+          // Ignore DOMException: Blocked a frame with origin from accessing a cross-origin frame.
+          // A hack to get around same-origin security policy errors in IE.
         }
-      }, 35);
+      }, 500);
     });
   }
 }
@@ -117,4 +113,11 @@ const parseUrl = url => {
   let hash = (url.hash.charAt(0) === '#') ? url.hash.substr(1) : url.hash;
 
   return extend(true, {}, parseQueryString(url.search), parseQueryString(hash));
+};
+
+const getFullUrlPath = location => {
+  const isHttps = location.protocol === 'https:';
+  return location.protocol + '//' + location.hostname +
+    ':' + (location.port || (isHttps ? '443' : '80')) +
+    (/^\//.test(location.pathname) ? location.pathname : '/' + location.pathname);
 };

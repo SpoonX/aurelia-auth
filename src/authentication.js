@@ -86,8 +86,10 @@ export class Authentication {
     if (response) {
       this.getDataFromResponse(response);
       this.storage.set(this.config.storageKey, JSON.stringify(response));
+
       return;
     }
+
     this.accessToken      = null;
     this.refreshToken     = null;
     this.idToken          = null;
@@ -102,27 +104,42 @@ export class Authentication {
   /* get data, update if needed first */
 
   getAccessToken() {
-    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) {
+      this.getDataFromResponse(this.getResponseObject());
+    }
+
     return this.accessToken;
   }
 
   getRefreshToken() {
-    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) {
+      this.getDataFromResponse(this.getResponseObject());
+    }
+
     return this.refreshToken;
   }
 
   getIdToken() {
-    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) {
+      this.getDataFromResponse(this.getResponseObject());
+    }
+
     return this.idToken;
   }
 
   getPayload() {
-    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) {
+      this.getDataFromResponse(this.getResponseObject());
+    }
+
     return this.payload;
   }
 
   getExp() {
-    if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+    if (!this.responseAnalyzed) {
+      this.getDataFromResponse(this.getResponseObject());
+    }
+
     return this.exp;
   }
 
@@ -131,17 +148,23 @@ export class Authentication {
 
   getTtl() {
     const exp = this.getExp();
+
     return  Number.isNaN(exp) ? NaN : exp - Math.round(new Date().getTime() / 1000);
   }
 
   isTokenExpired() {
     const timeLeft = this.getTtl();
+
     return Number.isNaN(timeLeft) ? undefined : timeLeft < 0;
   }
 
   isAuthenticated() {
     const isTokenExpired = this.isTokenExpired();
-    if (isTokenExpired === undefined ) return this.accessToken ? true : false;
+
+    if (isTokenExpired === undefined ) {
+      return this.accessToken ? true : false;
+    }
+
     return !isTokenExpired;
   }
 
@@ -200,7 +223,9 @@ export class Authentication {
   }
 
   getTokenFromResponse(response, tokenProp, tokenName, tokenRoot) {
-    if (!response) return undefined;
+    if (!response) {
+      return undefined;
+    }
 
     const responseTokenProp = tokenProp.split('.').reduce((o, x) => o[x], response);
 
@@ -212,14 +237,18 @@ export class Authentication {
       const tokenRootData = tokenRoot && tokenRoot.split('.').reduce((o, x) => o[x], responseTokenProp);
       const token = tokenRootData ? tokenRootData[tokenName] : responseTokenProp[tokenName];
 
-      if (!token) throw new Error('Token not found in response');
+      if (!token) {
+        throw new Error('Token not found in response');
+      }
 
       return token;
     }
 
     const token = response[tokenName] === undefined ? null : response[tokenName];
 
-    if (!token) throw new Error('Token not found in response');
+    if (!token) {
+      throw new Error('Token not found in response');
+    }
 
     return token;
   }

@@ -279,6 +279,20 @@ export class BaseConfig {
       oauthType: '2.0',
       popupOptions: { width: 1028, height: 529 }
     },
+    spotify: {
+      name: 'spotify',
+      url: '/auth/spotify',
+      authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+      redirectUri: PLATFORM.location.origin,
+      optionalUrlParams: ['state'],
+      requiredUrlParams: ['scope'],
+      scope: ['user-read-email'],
+      scopePrefix: '',
+      scopeDelimiter: ',',
+      oauthType: '2.0',
+      popupOptions: { width: 500, height: 530 },
+      state: () => encodeURIComponent(Math.random().toString(36).substr(2))
+    },
     auth0: {
       name: 'auth0',
       oauthType: 'auth0-lock',

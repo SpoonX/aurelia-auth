@@ -12,11 +12,17 @@ export class OAuth1 {
     this.config   = config;
     this.popup    = popup;
     this.defaults = {
-      url: null,
       name: null,
-      popupOptions: null,
+      url: null,
+      authorizationEndpoint: null,
+      scope: null,
+      scopePrefix: null,
+      scopeDelimiter: null,
       redirectUri: null,
-      authorizationEndpoint: null
+      requiredUrlParams: null,
+      defaultUrlParams: null,
+      oauthType: '1.0',
+      popupOptions: { width: null, height: null }
     };
   }
 
@@ -40,7 +46,7 @@ export class OAuth1 {
 
         const popupListener = this.config.platform === 'mobile'
                             ? this.popup.eventListener(provider.redirectUri)
-                            : this.popup.pollPopup();
+                            : this.popup.pollPopup(provider.redirectUri);
 
         return popupListener.then(result => this.exchangeForToken(result, userData, provider));
       });

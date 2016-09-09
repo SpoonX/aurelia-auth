@@ -83,6 +83,7 @@ export class FetchConfig {
   configure(client) {
     if (Array.isArray(client)) {
       let configuredClients = [];
+
       client.forEach(toConfigure => {
         configuredClients.push(this.configure(toConfigure));
       });
@@ -92,6 +93,7 @@ export class FetchConfig {
 
     if (typeof client === 'string') {
       const endpoint = this.clientConfig.getEndpoint(client);
+
       if (!endpoint) {
         throw new Error(`There is no '${client || 'default'}' endpoint registered.`);
       }

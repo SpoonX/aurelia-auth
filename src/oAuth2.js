@@ -11,20 +11,26 @@ export class OAuth2 {
     this.storage      = storage;
     this.config       = config;
     this.popup        = popup;
-    this.defaults     = {
-      url: null,
+    this.defaults = {
       name: null,
-      state: null,
-      scope: null,
-      scopeDelimiter: null,
-      redirectUri: null,
-      popupOptions: null,
+      url: null,
+      clientId: null,
       authorizationEndpoint: null,
-      responseParams: null,
+      redirectUri: null,
+      scope: null,
+      scopePrefix: null,
+      scopeDelimiter: null,
+      state: null,
       requiredUrlParams: null,
-      optionalUrlParams: null,
       defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
-      responseType: 'code'
+      responseType: 'code',
+      responseParams: {
+        code: 'code',
+        clientId: 'clientId',
+        redirectUri: 'redirectUri'
+      },
+      oauthType: '2.0',
+      popupOptions: { width: null, height: null }
     };
   }
 
@@ -43,7 +49,7 @@ export class OAuth2 {
     const popup     = this.popup.open(url, provider.name, provider.popupOptions);
     const openPopup = (this.config.platform === 'mobile')
                     ? popup.eventListener(provider.redirectUri)
-                    : popup.pollPopup();
+                    : popup.pollPopup(provider.redirectUri);
 
     return openPopup
       .then(oauthData => {
@@ -53,23 +59,45 @@ export class OAuth2 {
         ) {
           return oauthData;
         }
+
         if (oauthData.state && oauthData.state !== this.storage.get(stateName)) {
-          return Promise.reject('OAuth 2.0 state parameter mismatch.');
+          throw new Error('OAuth 2.0 state parameter mismatch.');
         }
+
         return this.exchangeForToken(oauthData, userData, provider);
       });
   }
 
   exchangeForToken(oauthData, userData, provider) {
-    const data = extend(true, {}, userData, {
-      clientId: provider.clientId,
-      redirectUri: provider.redirectUri
-    }, oauthData);
+    const payload = extend({}, userData);
+
+    // add default responseParameter to the authentication server request
+    for (let key in provider.responseParams) {
+      let value = provider.responseParams[key];
+
+      switch (key) {
+      case 'code':
+        payload[value] = oauthData.code;
+        break;
+      case 'clientId':
+        payload[value] = provider.clientId;
+        break;
+      case 'redirectUri':
+        payload[value] = provider.redirectUri;
+        break;
+      default:
+        payload[value] = oauthData[key];
+      }
+    }
+
+    if (oauthData.state) {
+      payload.state = oauthData.state;
+    }
 
     const serverUrl   = this.config.joinBase(provider.url);
     const credentials = this.config.withCredentials ? 'include' : 'same-origin';
 
-    return this.config.client.post(serverUrl, data, {credentials: credentials});
+    return this.config.client.post(serverUrl, payload, {credentials: credentials});
   }
 
   buildQuery(provider) {
@@ -98,6 +126,7 @@ export class OAuth2 {
         query[paramName] = paramValue;
       });
     });
+
     return query;
   }
 
