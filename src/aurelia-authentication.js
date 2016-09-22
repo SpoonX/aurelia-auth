@@ -1,6 +1,6 @@
 import {PLATFORM} from 'aurelia-pal';
 import {HttpClient} from 'aurelia-fetch-client';
-import {Config, Rest} from 'aurelia-api';
+import {Config as ApiConfig, Rest} from 'aurelia-api';
 import {BaseConfig} from './baseConfig';
 import {FetchConfig} from './fetchClientConfig';
 import * as LogManager from 'aurelia-logging';
@@ -16,18 +16,19 @@ import {AuthenticatedValueConverter} from './authenticatedValueConverter'; // es
  * @param {{globalResources: Function, container: {Container}}} aurelia
  * @param {{}|Function}                                         config
  */
-export function configure(aurelia, config) {
+export function configure(aurelia, configOrConfigure) {
   // ie9 polyfill
   if (!PLATFORM.location.origin) {
     PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
   }
 
-  const baseConfig = aurelia.container.get(BaseConfig);
+  let baseConfig = aurelia.container.get(BaseConfig);
 
-  if (typeof config === 'function') {
-    config(baseConfig);
-  } else if (typeof config === 'object') {
-    baseConfig.configure(config);
+  // set user config
+  if (typeof configOrConfigure === 'function') {
+    configOrConfigure(baseConfig);
+  } else {
+    baseConfig.configure(configOrConfigure);
   }
 
   // after baseConfig was configured
@@ -35,22 +36,18 @@ export function configure(aurelia, config) {
     aurelia.globalResources(`./${converter}`);
     LogManager.getLogger('authentication').info(`Add globalResources value-converter: ${converter}`);
   }
-  const fetchConfig  = aurelia.container.get(FetchConfig);
-  const clientConfig = aurelia.container.get(Config);
 
   // Array? Configure the provided endpoints.
   if (Array.isArray(baseConfig.configureEndpoints)) {
-    baseConfig.configureEndpoints.forEach(endpointToPatch => {
-      fetchConfig.configure(endpointToPatch);
-    });
+    aurelia.container.get(FetchConfig).configure(baseConfig.configureEndpoints);
   }
 
-  let client;
+  let client = baseConfig.client;
 
   // Let's see if there's a configured named or default endpoint or a HttpClient.
-  if (baseConfig.endpoint !== null) {
+  if (!client && baseConfig.endpoint !== null) {
     if (typeof baseConfig.endpoint === 'string') {
-      const endpoint = clientConfig.getEndpoint(baseConfig.endpoint);
+      const endpoint =  aurelia.container.get(ApiConfig).getEndpoint(baseConfig.endpoint);
       if (!endpoint) {
         throw new Error(`There is no '${baseConfig.endpoint || 'default'}' endpoint registered.`);
       }

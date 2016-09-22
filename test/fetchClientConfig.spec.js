@@ -1,15 +1,15 @@
 import {Container} from 'aurelia-dependency-injection';
 import {HttpClient} from 'aurelia-fetch-client';
-import {Config} from 'aurelia-api';
+import {Config as ApiConfig} from 'aurelia-api';
 
 import {FetchConfig} from '../src/fetchClientConfig';
 import {AuthService} from '../src/authService';
 
 function getContainer() {
   let container = new Container();
-  let config    = container.get(Config);
+  let apiConfig    = container.get(ApiConfig);
 
-  config
+  apiConfig
     .registerEndpoint('sx/default', 'http://localhost:1927/')
     .registerEndpoint('sx/custom', 'http://localhost:1927/custom')
     .setDefaultEndpoint('sx/default');
@@ -19,7 +19,7 @@ function getContainer() {
 
 describe('FetchConfig', function() {
   let container      = getContainer();
-  let clientConfig   = container.get(Config);
+  let clientConfig   = container.get(ApiConfig);
   let fetchConfig    = container.get(FetchConfig);
   let authService    = container.get(AuthService);
 

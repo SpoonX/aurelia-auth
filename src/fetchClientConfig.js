@@ -1,16 +1,16 @@
 import {inject} from 'aurelia-dependency-injection';
 import {HttpClient} from 'aurelia-fetch-client';
-import {Config, Rest} from 'aurelia-api';
+import {Config as ApiConfig, Rest} from 'aurelia-api';
 import {AuthService} from './authService';
 import {BaseConfig} from './baseConfig';
 
-@inject(HttpClient, Config, AuthService, BaseConfig)
+@inject(HttpClient, ApiConfig, AuthService, BaseConfig)
 export class FetchConfig {
   /**
    * Construct the FetchConfig
    *
    * @param {HttpClient} httpClient
-   * @param {Config} clientConfig
+   * @param {ApiConfig} clientConfig
    * @param {Authentication} authService
    * @param {BaseConfig} config
    */

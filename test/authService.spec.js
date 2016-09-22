@@ -2,7 +2,7 @@ import {Container} from 'aurelia-dependency-injection';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {bindingMode, BindingEngine, createScopeForTest} from 'aurelia-binding';
 import {SignalBindingBehavior, BindingSignaler} from 'aurelia-templating-resources';
-import {Config, Rest} from 'aurelia-api';
+import {Config as ApiConfig, Rest} from 'aurelia-api';
 
 import {configure} from '../src/aurelia-authentication';
 import {AuthService} from '../src/authService';
@@ -22,7 +22,7 @@ const noop = () => {};
 
 function getContainer() {
   const container = new Container();
-  const config    = container.get(Config);
+  const config    = container.get(ApiConfig);
 
   config
     .registerEndpoint('sx/default', 'http://localhost:1927/')

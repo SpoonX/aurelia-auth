@@ -32,7 +32,7 @@ function getContainer() {
 describe('OAuth1', () => {
   const container = getContainer();
   const storage = container.get(Storage);
-  const baseConfig = container.get(BaseConfig);
+  const baseConfig = storage.config;
   const popup = {
     open: () => popup,
     eventListener: ()=>{},

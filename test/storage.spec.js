@@ -6,7 +6,7 @@ import {BaseConfig} from '../src/baseConfig';
 describe('Storage', () => {
   const container  = new Container();
   const storage    = container.get(Storage);
-  const baseConfig = container.get(BaseConfig);
+  const baseConfig = storage.config;
   const defaultKey = 'localStorage';
 
   afterEach(() => {

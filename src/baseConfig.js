@@ -3,169 +3,144 @@ import {join} from 'aurelia-path';
 import extend from 'extend';
 import * as LogManager from 'aurelia-logging';
 
-export class BaseConfig {
-  /**
-   * Prepends baseUrl to a given url
-   * @param  {String} url The relative url to append
-   * @return {String}     joined baseUrl and url
-   */
-  joinBase(url) {
-    return join(this.baseUrl, url);
-  }
-
-  /**
-   * Merge current settings with incomming settings
-   * @param  {Object} incomming Settings object to be merged into the current configuration
-   * @return {Config}           this
-   */
-  configure(incomming) {
-    for (let key in incomming) {
-      const value = incomming[key];
-      if (value !== undefined) {
-        if (Array.isArray(value) || typeof value !== 'object' || value === null) {
-          this[key] = value;
-        } else {
-          extend(true, this[key], value);
-        }
-      }
-    }
-  }
-
-  /* ----------- default  config ----------- */
-
-  // Used internally. The used Rest instance; set during configuration (see index.js)
-  client = null;
+/**
+ * @export
+ * defaults
+ **/
+export let defaults = {
+  // Used internally. The used Rest instance, set during configuration (see index.js)
+  client: null,
 
   // If using aurelia-api:
   // =====================
 
   // This is the name of the endpoint used for any requests made in relation to authentication (login, logout, etc.). An empty string selects the default endpoint of aurelia-api.
-  endpoint = null;
+  endpoint: null,
   // When authenticated, these endpoints will have the token added to the header of any requests (for authorization). Accepts an array of endpoint names. An empty string selects the default endpoint of aurelia-api.
-  configureEndpoints = null;
+  configureEndpoints: null,
 
 
   // SPA related options
   // ===================
 
   // The SPA url to which the user is redirected after a successful login
-  loginRedirect = '#/';
+  loginRedirect: '#/',
   // The SPA url to which the user is redirected after a successful logout
-  logoutRedirect = '#/';
+  logoutRedirect: '#/',
   // The SPA route used when an unauthenticated user tries to access an SPA page that requires authentication
-  loginRoute = '/login';
+  loginRoute: '/login',
   // Whether or not an authentication token is provided in the response to a successful signup
-  loginOnSignup = true;
+  loginOnSignup: true,
   // If loginOnSignup == false: The SPA url to which the user is redirected after a successful signup (else loginRedirect is used)
-  signupRedirect = '#/login';
+  signupRedirect: '#/login',
   // The SPA url to load when the token expires
-  expiredRedirect = '#/';
+  expiredRedirect: '#/',
   // The SPA url to load when the authentication status changed in other tabs/windows (detected through storageEvents)
-  storageChangedRedirect = '#/';
+  storageChangedRedirect: '#/',
 
   // API related options
   // ===================
 
   // The base url used for all authentication related requests, including provider.url below.
   // This appends to the httpClient/endpoint base url, it does not override it.
-  baseUrl = '';
+  baseUrl: '',
   // The API endpoint to which login requests are sent
-  loginUrl = '/auth/login';
+  loginUrl: '/auth/login',
   // The API endpoint to which logout requests are sent (not needed for jwt)
-  logoutUrl = null;
+  logoutUrl: null,
   // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
-  logoutMethod = 'get';
+  logoutMethod: 'get',
   // The API endpoint to which signup requests are sent
-  signupUrl = '/auth/signup';
+  signupUrl: '/auth/signup',
   // The API endpoint used in profile requests (inc. `find/get` and `update`)
-  profileUrl = '/auth/me';
+  profileUrl: '/auth/me',
   // The method used to update the profile ('put' or 'patch')
-  profileMethod = 'put';
+  profileMethod: 'put',
   // The API endpoint used with oAuth to unlink authentication
-  unlinkUrl = '/auth/unlink/';
+  unlinkUrl: '/auth/unlink/',
   // The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
-  unlinkMethod = 'get';
-  // The API endpoint to which refreshToken requests are sent. null = loginUrl
-  refreshTokenUrl = null;
+  unlinkMethod: 'get',
+  // The API endpoint to which refreshToken requests are sent. null: loginUrl
+  refreshTokenUrl: null,
 
 
   // Token Options
   // =============
 
   // The header property used to contain the authToken in the header of API requests that require authentication
-  authHeader = 'Authorization';
+  authHeader: 'Authorization',
   // The token name used in the header of API requests that require authentication
-  authTokenType = 'Bearer';
+  authTokenType: 'Bearer',
   // The the property from which to get the access token after a successful login or signup. Can also be dotted eg "accessTokenProp.accessTokenName"
-  accessTokenProp = 'access_token';
+  accessTokenProp: 'access_token',
 
 
   // If the property defined by `accessTokenProp` is an object:
   // ------------------------------------------------------------
 
   //This is the property from which to get the token `{ "accessTokenProp": { "accessTokenName" : '...' } }`
-  accessTokenName = 'token';
+  accessTokenName: 'token',
   // This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
-  accessTokenRoot = false;
+  accessTokenRoot: false,
 
 
   // Refresh Token Options
   // =====================
 
   // Option to turn refresh tokens On/Off
-  useRefreshToken = false;
+  useRefreshToken: false,
   // The option to enable/disable the automatic refresh of Auth tokens using Refresh Tokens
-  autoUpdateToken = true;
+  autoUpdateToken: true,
   // Oauth Client Id
-  clientId = false;
+  clientId: false,
   // The the property from which to get the refresh token after a successful token refresh. Can also be dotted eg "refreshTokenProp.refreshTokenProp"
-  refreshTokenProp = 'refresh_token';
+  refreshTokenProp: 'refresh_token',
 
   // If the property defined by `refreshTokenProp` is an object:
   // -----------------------------------------------------------
 
   // This is the property from which to get the token `{ "refreshTokenProp": { "refreshTokenName" : '...' } }`
-  refreshTokenName = 'token';
+  refreshTokenName: 'token',
   // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
-  refreshTokenRoot = false;
+  refreshTokenRoot: false,
 
   // The property name from which to get the user authentication token. Can also be dotted idTokenProp.idTokenName
-  idTokenProp = 'id_token';
+  idTokenProp: 'id_token',
   // This is the property from which to get the id token `{ "idTokenProp": { "idTokenName" : '...' } }`
-  idTokenName = 'token';
+  idTokenName: 'token',
   // This allows the id_token to be a further object deeper `{ "idTokenProp": { "idTokenRoot" : { "idTokenName" : '...' } } }`
-  idTokenRoot = false;
+  idTokenRoot: false,
 
   // Miscellaneous Options
   // =====================
 
   // Whether to enable the fetch interceptor which automatically adds the authentication headers
   // (or not... e.g. if using a session based API or you want to override the default behaviour)
-  httpInterceptor = true;
+  httpInterceptor: true,
   // For OAuth only: Tell the API whether or not to include token cookies in the response (for session based APIs)
-  withCredentials = true;
+  withCredentials: true,
   // Controls how the popup is shown for different devices (Options: 'browser' or 'mobile')
-  platform = 'browser';
+  platform: 'browser',
   // Determines the `PLATFORM` property name upon which aurelia-authentication data is stored (Default: `PLATFORM.localStorage`)
-  storage = 'localStorage';
+  storage: 'localStorage',
   // The key used for storing the authentication response locally
-  storageKey = 'aurelia_authentication';
+  storageKey: 'aurelia_authentication',
   // optional function to extract the expiration date. takes the server response as parameter
-  // eg (expires_in in sec): getExpirationDateFromResponse = serverResponse => new Date().getTime() + serverResponse.expires_in * 1000;
-  getExpirationDateFromResponse = null;
+  // eg (expires_in in sec): getExpirationDateFromResponse: serverResponse => new Date().getTime() + serverResponse.expires_in * 1000,
+  getExpirationDateFromResponse: null,
   // optional function to extract the access token from the response. takes the server response as parameter
-  // eg: getAccessTokenFromResponse = serverResponse => serverResponse.data[0].access_token;
-  getAccessTokenFromResponse = null;
+  // eg: getAccessTokenFromResponse: serverResponse => serverResponse.data[0].access_token,
+  getAccessTokenFromResponse: null,
   // optional function to extract the refresh token from the response. takes the server response as parameter
-  // eg: getRefreshTokenFromResponse = serverResponse => serverResponse.data[0].refresh_token;
-  getRefreshTokenFromResponse = null;
+  // eg: getRefreshTokenFromResponse: serverResponse => serverResponse.data[0].refresh_token,
+  getRefreshTokenFromResponse: null,
 
   // List of value-converters to make global
-  globalValueConverters = ['authFilterValueConverter'];
+  globalValueConverters: ['authFilterValueConverter'],
 
 //OAuth provider specific related configuration
   // ============================================
-  providers = {
+  providers: {
     facebook: {
       name: 'facebook',
       url: '/auth/facebook',
@@ -291,7 +266,36 @@ export class BaseConfig {
       responseType: 'token',
       state: randomState
     }
-  };
+  }
+};
+
+/**
+ * @export
+ * @class BaseConfig
+ **/
+export class BaseConfig {
+  constructor() {
+    // set own defaults
+    extend(true, this, defaults);
+  }
+
+  /**
+   * Prepends baseUrl to a given url
+   * @param  {String} url The relative url to append
+   * @return {String}     joined baseUrl and url
+   */
+  joinBase(url) {
+    return join(this.baseUrl, url);
+  }
+
+  /**
+   * Merge current settings with incomming settings
+   * @param  {Object} incomming Settings object to be merged into the current configuration
+   * @return {Config}           this
+   */
+  configure(incomming) {
+    extend(true, this, incomming);
+  }
 
   /* deprecated defaults */
   /**

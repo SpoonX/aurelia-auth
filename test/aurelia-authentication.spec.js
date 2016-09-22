@@ -1,5 +1,5 @@
 import {Container} from 'aurelia-dependency-injection';
-import {Config, Rest} from 'aurelia-api';
+import {Config as ApiConfig, Rest} from 'aurelia-api';
 import {HttpClient} from 'aurelia-fetch-client';
 
 import {configure} from '../src/aurelia-authentication';
@@ -13,7 +13,7 @@ let noop = () => {};
 
 function getContainer() {
   let container = new Container();
-  let config    = container.get(Config);
+  let config    = container.get(ApiConfig);
 
   config
     .registerEndpoint('sx/default', 'http://localhost:1927/')
@@ -24,28 +24,6 @@ function getContainer() {
 }
 
 describe('aurelia-authentication', function() {
-  describe('export', function() {
-    it('Should export configure', function() {
-      expect(configure).toBeDefined();
-    });
-
-    it('Should export FetchConfig', function() {
-      expect(FetchConfig).toBeDefined();
-    });
-
-    it('Should export AuthService', function() {
-      expect(AuthService).toBeDefined();
-    });
-
-    it('Should export AuthorizeStep', function() {
-      expect(AuthorizeStep).toBeDefined();
-    });
-
-    it('Should export AuthenticateStep', function() {
-      expect(AuthenticateStep).toBeDefined();
-    });
-  });
-
   describe('configure()', function() {
     it('Should call globalResources configuration to be passed as a function.', function() {
       let container = new Container();
@@ -117,7 +95,7 @@ describe('aurelia-authentication', function() {
     it('Should set the configured endpoint as a client.', function() {
       let container    = getContainer();
       let baseConfig   = container.get(BaseConfig);
-      let clientConfig = container.get(Config);
+      let clientConfig = container.get(ApiConfig);
 
       configure({container: container, globalResources: noop}, {endpoint: 'sx/custom'});
 
@@ -128,7 +106,7 @@ describe('aurelia-authentication', function() {
     it('Should set the default endpoint as a client.', function() {
       let container    = getContainer();
       let baseConfig   = container.get(BaseConfig);
-      let clientConfig = container.get(Config);
+      let clientConfig = container.get(ApiConfig);
 
       configure({container: container, globalResources: noop}, {endpoint: ''});
 
@@ -145,6 +123,18 @@ describe('aurelia-authentication', function() {
       expect(baseConfig.endpoint).toEqual(null);
       expect(baseConfig.client instanceof Rest).toBe(true);
       expect(baseConfig.client.client).toBe(container.get(HttpClient));
+    });
+
+    it('Should use previously set baseConfig.(rest)client.', function() {
+      let container  = new Container();
+      let baseConfig = container.get(BaseConfig);
+
+      class CustomRest extends Rest {}
+      baseConfig.client = new CustomRest;
+
+      configure({container: container, globalResources: noop}, {});
+
+      expect(baseConfig.client instanceof CustomRest).toBe(true);
     });
   });
 });
