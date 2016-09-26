@@ -2,6 +2,14 @@ import {PLATFORM, DOM} from 'aurelia-pal';
 import {parseQueryString} from 'aurelia-path';
 import extend from 'extend';
 
+export class PopupError extends Error {
+  constructor(msg, error) {
+    super(msg);
+    this.data  = msg;   // BC
+    this.error = error;
+  }
+}
+
 export class Popup {
   constructor() {
     this.popupWindow = null;
@@ -36,7 +44,7 @@ export class Popup {
           const qs = parseUrl(parser);
 
           if (qs.error) {
-            reject({error: qs.error});
+            reject(new PopupError('Query contains error', qs.error));
           } else {
             resolve(qs);
           }
@@ -46,11 +54,11 @@ export class Popup {
       });
 
       this.popupWindow.addEventListener('exit', () => {
-        reject({data: 'Provider Popup was closed'});
+        reject(new PopupError('Provider Popup was closed'));
       });
 
       this.popupWindow.addEventListener('loaderror', () => {
-        reject({data: 'Authorization Failed'});
+        reject(new PopupError('Authorization Failed'));
       });
     });
   }
@@ -66,7 +74,7 @@ export class Popup {
             const qs = parseUrl(this.popupWindow.location);
 
             if (qs.error) {
-              reject({error: qs.error});
+              reject(new PopupError('Query contains error', qs.error));
             } else {
               resolve(qs);
             }
@@ -80,16 +88,10 @@ export class Popup {
 
         if (!this.popupWindow) {
           PLATFORM.global.clearInterval(this.polling);
-          reject({
-            error: errorData,
-            data: 'Provider Popup Blocked'
-          });
+          reject(new PopupError('Provider Popup Blocked', errorData));
         } else if (this.popupWindow.closed) {
           PLATFORM.global.clearInterval(this.polling);
-          reject({
-            error: errorData,
-            data: 'Problem poll popup'
-          });
+          reject(new PopupError('Problem poll popup', errorData));
         }
       }, 35);
     });

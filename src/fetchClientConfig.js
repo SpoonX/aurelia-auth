@@ -43,7 +43,7 @@ export class FetchConfig {
         return request;
       },
       response: (response, request) => {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
           if (response.ok) {
             return resolve(response);
           }

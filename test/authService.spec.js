@@ -863,7 +863,7 @@ describe('AuthService', () => {
           expect(authService.authentication.oAuth2.close).toHaveBeenCalled();
           done();
         }, err => {
-          expect(err).toBe('OAuth2 response state value differs');
+          expect(err.message).toBe('OAuth2 response state value differs');
           done();
         });
     });

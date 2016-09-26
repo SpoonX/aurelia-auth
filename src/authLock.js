@@ -3,6 +3,7 @@ import {inject} from 'aurelia-dependency-injection';
 import extend from 'extend';
 import {Storage} from './storage';
 import {BaseConfig} from './baseConfig';
+import {PopupError} from './popup';
 
 @inject(Storage, BaseConfig)
 export class AuthLock {
@@ -53,7 +54,7 @@ export class AuthLock {
 
       this.lock.show(provider.lockOptions, (err, profile, tokenOrCode) => {
         if (err) {
-          reject(err);
+          reject(new PopupError('AuthLock error', err));
         } else {
           resolve({
             //NOTE: this is an id token (JWT) and it shouldn't be named access_token

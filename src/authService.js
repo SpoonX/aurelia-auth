@@ -7,6 +7,14 @@ import * as LogManager from 'aurelia-logging';
 import {Authentication} from './authentication';
 import {BaseConfig} from './baseConfig';
 
+export class AuthServiceError extends Error {
+  constructor(msg, error) {
+    super(msg);
+    this.error = error;
+  }
+}
+
+
 @inject(Authentication, BaseConfig, BindingSignaler, EventAggregator)
 export class AuthService {
   /**
@@ -338,7 +346,7 @@ export class AuthService {
         })
         .catch(err => {
           this.setResponseObject(null);
-          this.authentication.resolveUpdateTokenCallstack(Promise.reject(err));
+          this.authentication.resolveUpdateTokenCallstack(Promise.reject(new AuthServiceError('Refresh token error', err)));
         });
     }
 
@@ -447,7 +455,7 @@ export class AuthService {
           .then(logoutResponse => {
             let stateValue = this.authentication.storage.get(name + '_state');
             if (logoutResponse.state !== stateValue) {
-              return Promise.reject('OAuth2 response state value differs');
+              return Promise.reject(new AuthServiceError('OAuth2 response state value differs'));
             }
             return localLogout(logoutResponse);
           });
