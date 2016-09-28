@@ -28,9 +28,7 @@ export class Authentication {
     this.responseAnalyzed     = false;
   }
 
-
   /* deprecated methods */
-
   @deprecated({message: 'Use baseConfig.loginRoute instead.'})
   getLoginRoute() {
     return this.config.loginRoute;
@@ -63,6 +61,7 @@ export class Authentication {
 
   get responseObject() {
     LogManager.getLogger('authentication').warn('Getter Authentication.responseObject is deprecated. Use Authentication.getResponseObject() instead.');
+
     return this.getResponseObject();
   }
 
@@ -73,11 +72,11 @@ export class Authentication {
 
   get hasDataStored() {
     LogManager.getLogger('authentication').warn('Authentication.hasDataStored is deprecated. Use Authentication.responseAnalyzed instead.');
+
     return this.responseAnalyzed;
   }
 
   /* get/set responseObject */
-
   getResponseObject() {
     return JSON.parse(this.storage.get(this.config.storageKey));
   }
@@ -86,6 +85,7 @@ export class Authentication {
     if (response) {
       this.getDataFromResponse(response);
       this.storage.set(this.config.storageKey, JSON.stringify(response));
+
       return;
     }
     this.accessToken      = null;
@@ -98,56 +98,59 @@ export class Authentication {
     this.storage.remove(this.config.storageKey);
   }
 
-
   /* get data, update if needed first */
-
   getAccessToken() {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+
     return this.accessToken;
   }
 
   getRefreshToken() {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+
     return this.refreshToken;
   }
 
   getIdToken() {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+
     return this.idToken;
   }
 
   getPayload() {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+
     return this.payload;
   }
 
   getExp() {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
+
     return this.exp;
   }
 
-
  /* get status from data */
-
   getTtl() {
     const exp = this.getExp();
+
     return  Number.isNaN(exp) ? NaN : exp - Math.round(new Date().getTime() / 1000);
   }
 
   isTokenExpired() {
     const timeLeft = this.getTtl();
+
     return Number.isNaN(timeLeft) ? undefined : timeLeft < 0;
   }
 
   isAuthenticated() {
     const isTokenExpired = this.isTokenExpired();
-    if (isTokenExpired === undefined ) return this.accessToken ? true : false;
+
+    if (isTokenExpired === undefined) return !!this.accessToken;
+
     return !isTokenExpired;
   }
 
-
   /* get and set from response */
-
   getDataFromResponse(response) {
     const config   = this.config;
 
@@ -155,7 +158,6 @@ export class Authentication {
     this.accessToken = typeof this.config.getAccessTokenFromResponse === 'function'
                      ? this.config.getAccessTokenFromResponse(response)
                      : this.getTokenFromResponse(response, config.accessTokenProp, config.accessTokenName, config.accessTokenRoot);
-
 
     this.refreshToken = null;
     if (config.useRefreshToken) {
@@ -181,7 +183,7 @@ export class Authentication {
     this.payload = null;
     try {
       this.payload = this.accessToken ? jwtDecode(this.accessToken) : null;
-    } catch (_) {_;}
+    } catch (_) {} // eslint-disable-line no-empty
 
     // get exp either with from jwt or with supplied function
     this.exp = typeof this.config.getExpirationDateFromResponse === 'function'
@@ -191,11 +193,11 @@ export class Authentication {
     this.responseAnalyzed = true;
 
     return {
-      accessToken: this.accessToken,
+      accessToken : this.accessToken,
       refreshToken: this.refreshToken,
-      idToken: this.idToken,
-      payload: this.payload,
-      exp: this.exp
+      idToken     : this.idToken,
+      payload     : this.payload,
+      exp         : this.exp
     };
   }
 
@@ -224,7 +226,6 @@ export class Authentication {
     return token;
   }
 
-
   toUpdateTokenCallstack() {
     return new Promise(resolve => this.updateTokenCallstack.push(resolve));
   }
@@ -233,7 +234,6 @@ export class Authentication {
     this.updateTokenCallstack.map(resolve => resolve(response));
     this.updateTokenCallstack = [];
   }
-
 
   /**
    * Authenticate with third-party
@@ -253,6 +253,7 @@ export class Authentication {
     }
 
     let providerLogin;
+
     if (oauthType === 'auth0-lock') {
       providerLogin = this.auth0Lock;
     } else {
@@ -264,9 +265,11 @@ export class Authentication {
 
   logout(name) {
     let rtnValue = Promise.resolve('Not Applicable');
+
     if (this.config.providers[name].oauthType !== '2.0' || !this.config.providers[name].logoutEndpoint) {
       return rtnValue;
     }
+
     return this.oAuth2.close(this.config.providers[name]);
   }
 
@@ -274,6 +277,7 @@ export class Authentication {
     // stupid rule to keep it BC
     if (redirectUrl === true) {
       LogManager.getLogger('authentication').warn('DEPRECATED: Setting redirectUrl === true to actually *not redirect* is deprecated. Set redirectUrl === 0 instead.');
+
       return;
     }
     // stupid rule to keep it BC

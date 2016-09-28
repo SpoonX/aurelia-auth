@@ -12,10 +12,10 @@ export class OAuth1 {
     this.config   = config;
     this.popup    = popup;
     this.defaults = {
-      url: null,
-      name: null,
-      popupOptions: null,
-      redirectUri: null,
+      url                  : null,
+      name                 : null,
+      popupOptions         : null,
+      redirectUri          : null,
       authorizationEndpoint: null
     };
   }

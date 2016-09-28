@@ -1,3 +1,4 @@
+/* eslint-disable max-lines, key-spacing */
 import {PLATFORM} from 'aurelia-pal';
 import {join} from 'aurelia-path';
 import extend from 'extend';
@@ -20,12 +21,15 @@ export class BaseConfig {
    */
   configure(incomming) {
     for (let key in incomming) {
-      const value = incomming[key];
-      if (value !== undefined) {
-        if (Array.isArray(value) || typeof value !== 'object' || value === null) {
-          this[key] = value;
-        } else {
-          extend(true, this[key], value);
+      if ({}.hasOwnProperty.call(incomming, key)) {
+        const value = incomming[key];
+
+        if (value !== undefined) {
+          if (Array.isArray(value) || typeof value !== 'object' || value === null) {
+            this[key] = value;
+          } else {
+            extend(true, this[key], value);
+          }
         }
       }
     }
@@ -43,7 +47,6 @@ export class BaseConfig {
   endpoint = null;
   // When authenticated, these endpoints will have the token added to the header of any requests (for authorization). Accepts an array of endpoint names. An empty string selects the default endpoint of aurelia-api.
   configureEndpoints = null;
-
 
   // SPA related options
   // ===================
@@ -88,7 +91,6 @@ export class BaseConfig {
   // The API endpoint to which refreshToken requests are sent. null = loginUrl
   refreshTokenUrl = null;
 
-
   // Token Options
   // =============
 
@@ -99,7 +101,6 @@ export class BaseConfig {
   // The the property from which to get the access token after a successful login or signup. Can also be dotted eg "accessTokenProp.accessTokenName"
   accessTokenProp = 'access_token';
 
-
   // If the property defined by `accessTokenProp` is an object:
   // ------------------------------------------------------------
 
@@ -107,7 +108,6 @@ export class BaseConfig {
   accessTokenName = 'token';
   // This allows the token to be a further object deeper `{ "accessTokenProp": { "accessTokenRoot" : { "accessTokenName" : '...' } } }`
   accessTokenRoot = false;
-
 
   // Refresh Token Options
   // =====================
@@ -178,7 +178,7 @@ export class BaseConfig {
       scopeDelimiter: ',',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 580, height: 400 }
+      popupOptions: {width: 580, height: 400}
     },
     google: {
       name: 'google',
@@ -192,7 +192,7 @@ export class BaseConfig {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 452, height: 633 },
+      popupOptions: {width: 452, height: 633},
       state: randomState
     },
     github: {
@@ -204,7 +204,7 @@ export class BaseConfig {
       scope: ['user:email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1020, height: 618 }
+      popupOptions: {width: 1020, height: 618}
     },
     instagram: {
       name: 'instagram',
@@ -226,7 +226,7 @@ export class BaseConfig {
       scopeDelimiter: ' ',
       state: 'STATE',
       oauthType: '2.0',
-      popupOptions: { width: 527, height: 582 }
+      popupOptions: {width: 527, height: 582}
     },
     twitter: {
       name: 'twitter',
@@ -234,7 +234,7 @@ export class BaseConfig {
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
       redirectUri: PLATFORM.location.origin,
       oauthType: '1.0',
-      popupOptions: { width: 495, height: 645 }
+      popupOptions: {width: 495, height: 645}
     },
     twitch: {
       name: 'twitch',
@@ -246,7 +246,7 @@ export class BaseConfig {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      popupOptions: {width: 500, height: 560}
     },
     live: {
       name: 'live',
@@ -258,7 +258,7 @@ export class BaseConfig {
       scopeDelimiter: ' ',
       display: 'popup',
       oauthType: '2.0',
-      popupOptions: { width: 500, height: 560 }
+      popupOptions: {width: 500, height: 560}
     },
     yahoo: {
       name: 'yahoo',
@@ -268,7 +268,7 @@ export class BaseConfig {
       scope: [],
       scopeDelimiter: ',',
       oauthType: '2.0',
-      popupOptions: { width: 559, height: 519 }
+      popupOptions: {width: 559, height: 519}
     },
     bitbucket: {
       name: 'bitbucket',
@@ -279,7 +279,7 @@ export class BaseConfig {
       scope: ['email'],
       scopeDelimiter: ' ',
       oauthType: '2.0',
-      popupOptions: { width: 1028, height: 529 }
+      popupOptions: {width: 1028, height: 529}
     },
     auth0: {
       name: 'auth0',
@@ -325,6 +325,7 @@ export class BaseConfig {
     LogManager.getLogger('authentication').warn('BaseConfig.authToken is deprecated. Use BaseConfig.authTokenType instead.');
     this._authTokenType = authToken;
     this.authTokenType = authToken;
+
     return authToken;
   }
   get authToken() {
@@ -338,6 +339,7 @@ export class BaseConfig {
     LogManager.getLogger('authentication').warn('BaseConfig.responseTokenProp is deprecated. Use BaseConfig.accessTokenProp instead.');
     this._responseTokenProp = responseTokenProp;
     this.accessTokenProp = responseTokenProp;
+
     return responseTokenProp;
   }
   get responseTokenProp() {
@@ -351,6 +353,7 @@ export class BaseConfig {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenRoot is deprecated. Use BaseConfig.accessTokenRoot instead.');
     this._tokenRoot = tokenRoot;
     this.accessTokenRoot = tokenRoot;
+
     return tokenRoot;
   }
   get tokenRoot() {
@@ -364,6 +367,7 @@ export class BaseConfig {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenName is deprecated. Use BaseConfig.accessTokenName instead.');
     this._tokenName = tokenName;
     this.accessTokenName = tokenName;
+
     return tokenName;
   }
   get tokenName() {
@@ -376,6 +380,7 @@ export class BaseConfig {
   set tokenPrefix(tokenPrefix) {
     LogManager.getLogger('authentication').warn('BaseConfig.tokenPrefix is obsolete. Use BaseConfig.storageKey instead.');
     this._tokenPrefix = tokenPrefix;
+
     return tokenPrefix;
   }
   get tokenPrefix() {
@@ -387,6 +392,7 @@ export class BaseConfig {
    */
   get current() {
     LogManager.getLogger('authentication').warn('Getter BaseConfig.current is deprecated. Use BaseConfig directly instead.');
+
     return this;
   }
   set current(_) {
@@ -398,6 +404,7 @@ export class BaseConfig {
    */
   get _current() {
     LogManager.getLogger('authentication').warn('Getter BaseConfig._current is deprecated. Use BaseConfig directly instead.');
+
     return this;
   }
   set _current(_) {
@@ -406,6 +413,9 @@ export class BaseConfig {
 }
 
 function randomState() {
-  let rand = Math.random().toString(36).substr(2);
+  let rand = Math.random()
+    .toString(36)
+    .substr(2);
+
   return encodeURIComponent(rand);
 }

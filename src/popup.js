@@ -30,6 +30,7 @@ export class Popup {
         }
 
         const parser  = DOM.createElement('a');
+
         parser.href = event.url;
 
         if (parser.search || parser.hash) {
@@ -82,13 +83,13 @@ export class Popup {
           PLATFORM.global.clearInterval(this.polling);
           reject({
             error: errorData,
-            data: 'Provider Popup Blocked'
+            data : 'Provider Popup Blocked'
           });
         } else if (this.popupWindow.closed) {
           PLATFORM.global.clearInterval(this.polling);
           reject({
             error: errorData,
-            data: 'Problem poll popup'
+            data : 'Problem poll popup'
           });
         }
       }, 35);
@@ -101,13 +102,14 @@ const buildPopupWindowOptions = options => {
   const height = options.height || 500;
 
   const extended = extend({
-    width: width,
+    width : width,
     height: height,
-    left: PLATFORM.global.screenX + ((PLATFORM.global.outerWidth - width) / 2),
-    top: PLATFORM.global.screenY + ((PLATFORM.global.outerHeight - height) / 2.5)
+    left  : PLATFORM.global.screenX + ((PLATFORM.global.outerWidth - width) / 2),
+    top   : PLATFORM.global.screenY + ((PLATFORM.global.outerHeight - height) / 2.5)
   }, options);
 
   let parts = [];
+
   Object.keys(extended).map(key => parts.push(key + '=' + extended[key]));
 
   return parts.join(',');

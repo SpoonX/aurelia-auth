@@ -12,19 +12,19 @@ export class OAuth2 {
     this.config       = config;
     this.popup        = popup;
     this.defaults     = {
-      url: null,
-      name: null,
-      state: null,
-      scope: null,
-      scopeDelimiter: null,
-      redirectUri: null,
-      popupOptions: null,
+      url                  : null,
+      name                 : null,
+      state                : null,
+      scope                : null,
+      scopeDelimiter       : null,
+      redirectUri          : null,
+      popupOptions         : null,
       authorizationEndpoint: null,
-      responseParams: null,
-      requiredUrlParams: null,
-      optionalUrlParams: null,
-      defaultUrlParams: ['response_type', 'client_id', 'redirect_uri'],
-      responseType: 'code'
+      responseParams       : null,
+      requiredUrlParams    : null,
+      optionalUrlParams    : null,
+      defaultUrlParams     : ['response_type', 'client_id', 'redirect_uri'],
+      responseType         : 'code'
     };
   }
 
@@ -47,22 +47,23 @@ export class OAuth2 {
 
     return openPopup
       .then(oauthData => {
-        if (provider.responseType === 'token' ||
-            provider.responseType === 'id_token token' ||
-            provider.responseType === 'token id_token'
+        if (provider.responseType === 'token'
+          || provider.responseType === 'id_token token'
+          || provider.responseType === 'token id_token'
         ) {
           return oauthData;
         }
         if (oauthData.state && oauthData.state !== this.storage.get(stateName)) {
           return Promise.reject('OAuth 2.0 state parameter mismatch.');
         }
+
         return this.exchangeForToken(oauthData, userData, provider);
       });
   }
 
   exchangeForToken(oauthData, userData, provider) {
     const data = extend(true, {}, userData, {
-      clientId: provider.clientId,
+      clientId   : provider.clientId,
       redirectUri: provider.redirectUri
     }, oauthData);
 
@@ -76,8 +77,8 @@ export class OAuth2 {
     let query = {};
     const urlParams   = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
 
-    urlParams.forEach( params => {
-      (provider[params] || []).forEach( paramName => {
+    urlParams.forEach(params => {
+      (provider[params] || []).forEach(paramName => {
         const camelizedName = camelCase(paramName);
         let paramValue      = (typeof provider[paramName] === 'function')
                               ? provider[paramName]()
@@ -98,6 +99,7 @@ export class OAuth2 {
         query[paramName] = paramValue;
       });
     });
+
     return query;
   }
 
@@ -129,12 +131,13 @@ export class OAuth2 {
     if (JSON.parse(authResponse).id_token) {
       query.id_token_hint = JSON.parse(authResponse).id_token;
     }
+
     return query;
   }
 }
 
-const camelCase = function(name) {
-  return name.replace(/([\:\-\_]+(.))/g, function(_, separator, letter, offset) {
+function camelCase(name) {
+  return name.replace(/([:\-_]+(.))/g, function(_, separator, letter, offset) {
     return offset ? letter.toUpperCase() : letter;
   });
-};
+}

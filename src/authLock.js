@@ -7,22 +7,20 @@ import {BaseConfig} from './baseConfig';
 @inject(Storage, BaseConfig)
 export class AuthLock {
   constructor(storage, config) {
-    this.storage      = storage;
-    this.config       = config;
-    this.defaults     = {
-      name: null,
-      state: null,
-      scope: null,
+    this.storage  = storage;
+    this.config   = config;
+    this.defaults = {
+      name          : null,
+      state         : null,
+      scope         : null,
       scopeDelimiter: null,
-      redirectUri: null,
-      clientId: null,
-      clientDomain: null,
-      display: 'popup',
-      lockOptions: {
-        popup: true
-      },
-      popupOptions: null,
-      responseType: 'token'
+      redirectUri   : null,
+      clientId      : null,
+      clientDomain  : null,
+      display       : 'popup',
+      lockOptions   : {popup: true},
+      popupOptions  : null,
+      responseType  : 'token'
     };
   }
 
@@ -44,6 +42,7 @@ export class AuthLock {
 
     const openPopup = new Promise((resolve, reject) => {
       let opts = provider.lockOptions;
+
       opts.popupOptions = provider.popupOptions;
       opts.responseType = provider.responseType;
       opts.callbackURL = provider.redirectUri;
@@ -65,9 +64,9 @@ export class AuthLock {
 
     return openPopup
       .then(lockResponse => {
-        if (provider.responseType === 'token' ||
-            provider.responseType === 'id_token%20token' ||
-            provider.responseType === 'token%20id_token'
+        if (provider.responseType === 'token'
+          || provider.responseType === 'id_token%20token'
+          || provider.responseType === 'token%20id_token'
         ) {
           return lockResponse;
         }

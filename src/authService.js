@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import {PLATFORM} from 'aurelia-pal';
 import {inject} from 'aurelia-dependency-injection';
 import {deprecated} from 'aurelia-metadata';
@@ -60,6 +61,7 @@ export class AuthService {
     if (oldToken) {
       LogManager.getLogger('authentication').info('Found token with deprecated format in storage. Converting it to new format. No further action required.');
       let fakeOldResponse = {};
+
       fakeOldResponse[config.accessTokenProp] = oldToken;
       this.setResponseObject(fakeOldResponse);
       authentication.storage.remove(oldStorageKey);
@@ -93,6 +95,7 @@ export class AuthService {
     }
 
     let wasAuthenticated = this.authenticated;
+
     this.authentication.responseAnalyzed = false;
     this.updateAuthenticated();
 
@@ -100,7 +103,6 @@ export class AuthService {
       PLATFORM.location.assign(this.config.storageChangedRedirect);
     }
   }
-
 
   /**
    * Getter: The configured client for all aurelia-authentication requests
@@ -119,6 +121,7 @@ export class AuthService {
    */
   get auth() {
     LogManager.getLogger('authentication').warn('AuthService.auth is deprecated. Use .authentication instead.');
+
     return this.authentication;
   }
 
@@ -175,6 +178,7 @@ export class AuthService {
     this.clearTimeout();
 
     let wasAuthenticated = this.authenticated;
+
     this.authenticated = this.authentication.isAuthenticated();
 
     if (this.authenticated && !Number.isNaN(this.authentication.exp)) {
@@ -200,6 +204,7 @@ export class AuthService {
     if (typeof criteriaOrId === 'string' || typeof criteriaOrId === 'number') {
       criteriaOrId = {id: criteriaOrId};
     }
+
     return this.client.find(this.config.joinBase(this.config.profileUrl), criteriaOrId);
   }
 
@@ -213,11 +218,12 @@ export class AuthService {
    */
   updateMe(body, criteriaOrId) {
     if (typeof criteriaOrId === 'string' || typeof criteriaOrId === 'number') {
-      criteriaOrId = { id: criteriaOrId };
+      criteriaOrId = {id: criteriaOrId};
     }
     if (this.config.profileMethod === 'put') {
       return this.client.update(this.config.joinBase(this.config.profileUrl), criteriaOrId, body);
     }
+
     return this.client.patch(this.config.joinBase(this.config.profileUrl), criteriaOrId, body);
   }
 
@@ -267,7 +273,8 @@ export class AuthService {
     if (!authenticated
       && this.config.autoUpdateToken
       && this.authentication.getAccessToken()
-      && this.authentication.getRefreshToken()) {
+      && this.authentication.getRefreshToken()
+    ) {
       this.updateToken();
       authenticated = true;
     }
@@ -324,7 +331,7 @@ export class AuthService {
     if (this.authentication.updateTokenCallstack.length === 0) {
       let content = {
         grant_type: 'refresh_token',
-        client_id: this.config.clientId ? this.config.clientId : undefined
+        client_id : this.config.clientId ? this.config.clientId : undefined
       };
 
       content[this.config.refreshTokenSubmitProp] = this.authentication.getRefreshToken();
@@ -357,25 +364,28 @@ export class AuthService {
    * @return {Promise<Object>|Promise<Error>}     Server response as Object
    */
   signup(displayNameOrCredentials, emailOrOptions, passwordOrRedirectUri, options, redirectUri) {
-    let content;
+    let normalized = {};
 
-    if (typeof arguments[0] === 'object') {
-      content     = arguments[0];
-      options     = arguments[1];
-      redirectUri = arguments[2];
+    if (typeof displayNameOrCredentials === 'object') {
+      normalized.credentials = displayNameOrCredentials;
+      normalized.options     = emailOrOptions;
+      normalized.redirectUri = passwordOrRedirectUri;
     } else {
-      content = {
+      normalized.credentials = {
         'displayName': displayNameOrCredentials,
-        'email': emailOrOptions,
-        'password': passwordOrRedirectUri
+        'email'      : emailOrOptions,
+        'password'   : passwordOrRedirectUri
       };
+      normalized.options     = options;
+      normalized.redirectUri = redirectUri;
     }
-    return this.client.post(this.config.joinBase(this.config.signupUrl), content, options)
+
+    return this.client.post(this.config.joinBase(this.config.signupUrl), normalized.credentials, normalized.options)
       .then(response => {
         if (this.config.loginOnSignup) {
           this.setResponseObject(response);
         }
-        this.authentication.redirect(redirectUri, this.config.signupRedirect);
+        this.authentication.redirect(normalized.redirectUri, this.config.signupRedirect);
 
         return response;
       });
@@ -392,29 +402,30 @@ export class AuthService {
    * @return {Promise<Object>|Promise<Error>}    Server response as Object
    */
   login(emailOrCredentials, passwordOrOptions, optionsOrRedirectUri, redirectUri) {
-    let content;
+    let normalized = {};
 
-    if (typeof arguments[0] === 'object') {
-      content              = arguments[0];
-      optionsOrRedirectUri = arguments[1];
-      redirectUri          = arguments[2];
+    if (typeof emailOrCredentials === 'object') {
+      normalized.credentials = emailOrCredentials;
+      normalized.options     = passwordOrOptions;
+      normalized.redirectUri = optionsOrRedirectUri;
     } else {
-      content = {
-        'email': emailOrCredentials,
+      normalized.credentials = {
+        'email'   : emailOrCredentials,
         'password': passwordOrOptions
       };
-      optionsOrRedirectUri = optionsOrRedirectUri;
+      normalized.options     = optionsOrRedirectUri;
+      normalized.redirectUri = redirectUri;
     }
 
     if (this.config.clientId) {
-      content.client_id = this.config.clientId;
+      normalized.credentials.client_id = this.config.clientId;
     }
 
-    return this.client.post(this.config.joinBase(this.config.loginUrl), content, optionsOrRedirectUri)
+    return this.client.post(this.config.joinBase(this.config.loginUrl), normalized.credentials, normalized.options)
       .then(response => {
         this.setResponseObject(response);
 
-        this.authentication.redirect(redirectUri, this.config.loginRedirect);
+        this.authentication.redirect(normalized.redirectUri, this.config.loginRedirect);
 
         return response;
       });
@@ -446,16 +457,18 @@ export class AuthService {
         return this.authentication.logout(name)
           .then(logoutResponse => {
             let stateValue = this.authentication.storage.get(name + '_state');
+
             if (logoutResponse.state !== stateValue) {
               return Promise.reject('OAuth2 response state value differs');
             }
+
             return localLogout(logoutResponse);
           });
       }
     } else {
-      return (this.config.logoutUrl
+      return this.config.logoutUrl
         ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout)
-        : localLogout());
+        : localLogout();
     }
   }
 
@@ -488,6 +501,7 @@ export class AuthService {
    */
   unlink(name, redirectUri) {
     const unlinkUrl = this.config.joinBase(this.config.unlinkUrl) + name;
+
     return this.client.request(this.config.unlinkMethod, unlinkUrl)
       .then(response => {
         this.authentication.redirect(redirectUri);

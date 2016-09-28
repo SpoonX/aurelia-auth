@@ -13,16 +13,18 @@ import {AuthenticatedValueConverter} from './authenticatedValueConverter'; // es
 /**
  * Configure the plugin.
  *
- * @param {{globalResources: Function, container: {Container}}} aurelia
- * @param {{}|Function}                                         config
+ * @param {FrameworkConfiguration} frameworkConfig The FrameworkConfiguration instance
+ * @param {{}|Function}            config          The Config instance
+ *
+ * @return undefined nothing
  */
-export function configure(aurelia, config) {
+export function configure(frameworkConfig, config) {
   // ie9 polyfill
   if (!PLATFORM.location.origin) {
     PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
   }
 
-  const baseConfig = aurelia.container.get(BaseConfig);
+  const baseConfig = frameworkConfig.container.get(BaseConfig);
 
   if (typeof config === 'function') {
     config(baseConfig);
@@ -32,11 +34,11 @@ export function configure(aurelia, config) {
 
   // after baseConfig was configured
   for (let converter of baseConfig.globalValueConverters) {
-    aurelia.globalResources(`./${converter}`);
+    frameworkConfig.globalResources(`./${converter}`);
     LogManager.getLogger('authentication').info(`Add globalResources value-converter: ${converter}`);
   }
-  const fetchConfig  = aurelia.container.get(FetchConfig);
-  const clientConfig = aurelia.container.get(Config);
+  const fetchConfig  = frameworkConfig.container.get(FetchConfig);
+  const clientConfig = frameworkConfig.container.get(Config);
 
   // Array? Configure the provided endpoints.
   if (Array.isArray(baseConfig.configureEndpoints)) {
@@ -51,6 +53,7 @@ export function configure(aurelia, config) {
   if (baseConfig.endpoint !== null) {
     if (typeof baseConfig.endpoint === 'string') {
       const endpoint = clientConfig.getEndpoint(baseConfig.endpoint);
+
       if (!endpoint) {
         throw new Error(`There is no '${baseConfig.endpoint || 'default'}' endpoint registered.`);
       }
@@ -62,7 +65,7 @@ export function configure(aurelia, config) {
 
   // No? Fine. Default to HttpClient. BC all the way.
   if (!(client instanceof Rest)) {
-    client = new Rest(aurelia.container.get(HttpClient));
+    client = new Rest(frameworkConfig.container.get(HttpClient));
   }
 
   // Set the client on the config, for use throughout the plugin.
