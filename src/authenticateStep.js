@@ -4,7 +4,7 @@ import {AuthService} from './authService';
 
 @inject(AuthService)
 export class AuthenticateStep {
-  constructor(authService) {
+  constructor(authService: AuthService) {
     this.authService = authService;
   }
 

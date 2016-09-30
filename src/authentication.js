@@ -1,4 +1,4 @@
-/// <reference path="../test/oAuth2.spec.js" />
+/* eslint-disable max-lines */
 import {PLATFORM} from 'aurelia-pal';
 import {buildQueryString} from 'aurelia-path';
 import {inject} from 'aurelia-dependency-injection';
@@ -13,7 +13,7 @@ import {AuthLock} from './authLock';
 
 @inject(Storage, BaseConfig, OAuth1, OAuth2, AuthLock)
 export class Authentication {
-  constructor(storage, config, oAuth1, oAuth2, auth0Lock) {
+  constructor(storage: Storage, config: BaseConfig, oAuth1: OAuth1, oAuth2: OAuth2, auth0Lock: AuthLock) {
     this.storage              = storage;
     this.config               = config;
     this.oAuth1               = oAuth1;
@@ -59,29 +59,29 @@ export class Authentication {
     return this.getAccessToken();
   }
 
-  get responseObject() {
+  get responseObject(): {} {
     LogManager.getLogger('authentication').warn('Getter Authentication.responseObject is deprecated. Use Authentication.getResponseObject() instead.');
 
     return this.getResponseObject();
   }
 
-  set responseObject(response) {
+  set responseObject(response: {}) {
     LogManager.getLogger('authentication').warn('Setter Authentication.responseObject is deprecated. Use AuthServive.setResponseObject(response) instead.');
     this.setResponseObject(response);
   }
 
-  get hasDataStored() {
+  get hasDataStored(): boolean {
     LogManager.getLogger('authentication').warn('Authentication.hasDataStored is deprecated. Use Authentication.responseAnalyzed instead.');
 
     return this.responseAnalyzed;
   }
 
   /* get/set responseObject */
-  getResponseObject() {
+  getResponseObject(): {} {
     return JSON.parse(this.storage.get(this.config.storageKey));
   }
 
-  setResponseObject(response) {
+  setResponseObject(response: {}) {
     if (response) {
       this.getDataFromResponse(response);
       this.storage.set(this.config.storageKey, JSON.stringify(response));
@@ -99,50 +99,50 @@ export class Authentication {
   }
 
   /* get data, update if needed first */
-  getAccessToken() {
+  getAccessToken(): string {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
 
     return this.accessToken;
   }
 
-  getRefreshToken() {
+  getRefreshToken(): string {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
 
     return this.refreshToken;
   }
 
-  getIdToken() {
+  getIdToken(): string {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
 
     return this.idToken;
   }
 
-  getPayload() {
+  getPayload(): {} {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
 
     return this.payload;
   }
 
-  getExp() {
+  getExp(): Number {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
 
     return this.exp;
   }
 
  /* get status from data */
-  getTtl() {
+  getTtl(): Number {
     const exp = this.getExp();
 
     return  Number.isNaN(exp) ? NaN : exp - Math.round(new Date().getTime() / 1000);
   }
 
-  isTokenExpired() {
+  isTokenExpired(): boolean {
     const timeLeft = this.getTtl();
 
     return Number.isNaN(timeLeft) ? undefined : timeLeft < 0;
   }
 
-  isAuthenticated() {
+  isAuthenticated(): boolean {
     const isTokenExpired = this.isTokenExpired();
 
     if (isTokenExpired === undefined) return !!this.accessToken;
@@ -151,7 +151,7 @@ export class Authentication {
   }
 
   /* get and set from response */
-  getDataFromResponse(response) {
+  getDataFromResponse(response: {}): {} {
     const config   = this.config;
 
     // get access token either with from supplied parameters or with supplied function
@@ -201,7 +201,18 @@ export class Authentication {
     };
   }
 
-  getTokenFromResponse(response, tokenProp, tokenName, tokenRoot) {
+  /**
+   * Extract the token from the server response
+   *
+   * @param {{}} response The response
+   * @param {string} tokenProp tokenProp
+   * @param {string} tokenName tokenName
+   * @param {string} tokenRoot tokenRoot
+   * @returns {string} The token
+   *
+   * @memberOf Authentication
+   */
+  getTokenFromResponse(response: {}, tokenProp: string, tokenName: string, tokenRoot: string): string {
     if (!response) return undefined;
 
     const responseTokenProp = tokenProp.split('.').reduce((o, x) => o[x], response);
@@ -226,11 +237,11 @@ export class Authentication {
     return token;
   }
 
-  toUpdateTokenCallstack() {
+  toUpdateTokenCallstack(): Promise<any> {
     return new Promise(resolve => this.updateTokenCallstack.push(resolve));
   }
 
-  resolveUpdateTokenCallstack(response) {
+  resolveUpdateTokenCallstack(response: {}) {
     this.updateTokenCallstack.map(resolve => resolve(response));
     this.updateTokenCallstack = [];
   }
@@ -238,12 +249,12 @@ export class Authentication {
   /**
    * Authenticate with third-party
    *
-   * @param {String}    name of the provider
-   * @param {[{}]}      [userData]
+   * @param {String}    name        Name of the provider
+   * @param {[{}]}      [userData]  Additional data send to the authenication server
    *
-   * @return {Promise<response>}
+   * @return {Promise<any>} The authentication server response
    */
-  authenticate(name, userData = {}) {
+  authenticate(name: string, userData: {} = {}): Promise<any> {
     let oauthType = this.config.providers[name].type;
 
     if (oauthType) {
@@ -263,7 +274,15 @@ export class Authentication {
     return providerLogin.open(this.config.providers[name], userData);
   }
 
-  logout(name) {
+  /**
+   * Send logout request to oauth provider
+   *
+   * @param {string} name The provider name
+   * @returns {Promise<any>} The server response
+   *
+   * @memberOf Authentication
+   */
+  logout(name: string): Promise<any> {
     let rtnValue = Promise.resolve('Not Applicable');
 
     if (this.config.providers[name].oauthType !== '2.0' || !this.config.providers[name].logoutEndpoint) {
@@ -273,7 +292,17 @@ export class Authentication {
     return this.oAuth2.close(this.config.providers[name]);
   }
 
-  redirect(redirectUrl, defaultRedirectUrl, query) {
+  /**
+   * Redirect (page reload if applicable for the browsers save password option)
+   *
+   * @param {[string]} redirectUrl The redirect url
+   * @param {[string]} defaultRedirectUrl The defaultRedirectUrl
+   * @param {[string]} query The optional query string to add the the url
+   * @returns {undefined} undefined
+   *
+   * @memberOf Authentication
+   */
+  redirect(redirectUrl?: string, defaultRedirectUrl?: string, query?: string) {
     // stupid rule to keep it BC
     if (redirectUrl === true) {
       LogManager.getLogger('authentication').warn('DEPRECATED: Setting redirectUrl === true to actually *not redirect* is deprecated. Set redirectUrl === 0 instead.');

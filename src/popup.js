@@ -9,7 +9,7 @@ export class Popup {
     this.url         = '';
   }
 
-  open(url, windowName, options) {
+  open(url: string, windowName: string, options?: {}): Popup {
     this.url = url;
     const optionsString = buildPopupWindowOptions(options || {});
 
@@ -22,7 +22,7 @@ export class Popup {
     return this;
   }
 
-  eventListener(redirectUri) {
+  eventListener(redirectUri: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.popupWindow.addEventListener('loadstart', event => {
         if (event.url.indexOf(redirectUri) !== 0) {
@@ -56,7 +56,7 @@ export class Popup {
     });
   }
 
-  pollPopup() {
+  pollPopup(): Promise<any> {
     return new Promise((resolve, reject) => {
       this.polling = PLATFORM.global.setInterval(() => {
         let errorData;
@@ -97,7 +97,7 @@ export class Popup {
   }
 }
 
-const buildPopupWindowOptions = options => {
+const buildPopupWindowOptions = (options: {}): string => {
   const width  = options.width || 500;
   const height = options.height || 500;
 
@@ -115,7 +115,7 @@ const buildPopupWindowOptions = options => {
   return parts.join(',');
 };
 
-const parseUrl = url => {
+const parseUrl = (url: string): {} => {
   let hash = (url.hash.charAt(0) === '#') ? url.hash.substr(1) : url.hash;
 
   return extend(true, {}, parseQueryString(url.search), parseQueryString(hash));

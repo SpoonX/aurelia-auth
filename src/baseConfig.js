@@ -1,4 +1,4 @@
-/* eslint-disable max-lines, key-spacing */
+/* eslint-disable max-lines */
 import {PLATFORM} from 'aurelia-pal';
 import {join} from 'aurelia-path';
 import extend from 'extend';
@@ -7,21 +7,20 @@ import * as LogManager from 'aurelia-logging';
 export class BaseConfig {
   /**
    * Prepends baseUrl to a given url
-   * @param  {String} url The relative url to append
-   * @return {String}     joined baseUrl and url
+   * @param  {string} url The relative url to append
+   * @return {string}     joined baseUrl and url
    */
-  joinBase(url) {
+  joinBase(url: string): string {
     return join(this.baseUrl, url);
   }
 
   /**
    * Merge current settings with incomming settings
    * @param  {Object} incomming Settings object to be merged into the current configuration
-   * @return {Config}           this
    */
-  configure(incomming) {
+  configure(incomming: {}): Config {
     for (let key in incomming) {
-      if ({}.hasOwnProperty.call(incomming, key)) {
+      if (incomming.hasOwnProperty(key)) {
         const value = incomming[key];
 
         if (value !== undefined) {
@@ -38,15 +37,15 @@ export class BaseConfig {
   /* ----------- default  config ----------- */
 
   // Used internally. The used Rest instance; set during configuration (see index.js)
-  client = null;
+  client: Rest = null;
 
   // If using aurelia-api:
   // =====================
 
   // This is the name of the endpoint used for any requests made in relation to authentication (login, logout, etc.). An empty string selects the default endpoint of aurelia-api.
-  endpoint = null;
+  endpoint: string = null;
   // When authenticated, these endpoints will have the token added to the header of any requests (for authorization). Accepts an array of endpoint names. An empty string selects the default endpoint of aurelia-api.
-  configureEndpoints = null;
+  configureEndpoints: Array<string> = null;
 
   // SPA related options
   // ===================
@@ -169,129 +168,129 @@ export class BaseConfig {
   // ============================================
   providers = {
     facebook: {
-      name: 'facebook',
-      url: '/auth/facebook',
+      name                 : 'facebook',
+      url                  : '/auth/facebook',
       authorizationEndpoint: 'https://www.facebook.com/v2.5/dialog/oauth',
-      redirectUri: PLATFORM.location.origin + '/',
-      requiredUrlParams: ['display', 'scope'],
-      scope: ['email'],
-      scopeDelimiter: ',',
-      display: 'popup',
-      oauthType: '2.0',
-      popupOptions: {width: 580, height: 400}
+      redirectUri          : PLATFORM.location.origin + '/',
+      requiredUrlParams    : ['display', 'scope'],
+      scope                : ['email'],
+      scopeDelimiter       : ',',
+      display              : 'popup',
+      oauthType            : '2.0',
+      popupOptions         : {width: 580, height: 400}
     },
     google: {
-      name: 'google',
-      url: '/auth/google',
+      name                 : 'google',
+      url                  : '/auth/google',
       authorizationEndpoint: 'https://accounts.google.com/o/oauth2/auth',
-      redirectUri: PLATFORM.location.origin,
-      requiredUrlParams: ['scope'],
-      optionalUrlParams: ['display', 'state'],
-      scope: ['profile', 'email'],
-      scopePrefix: 'openid',
-      scopeDelimiter: ' ',
-      display: 'popup',
-      oauthType: '2.0',
-      popupOptions: {width: 452, height: 633},
-      state: randomState
+      redirectUri          : PLATFORM.location.origin,
+      requiredUrlParams    : ['scope'],
+      optionalUrlParams    : ['display', 'state'],
+      scope                : ['profile', 'email'],
+      scopePrefix          : 'openid',
+      scopeDelimiter       : ' ',
+      display              : 'popup',
+      oauthType            : '2.0',
+      popupOptions         : {width: 452, height: 633},
+      state                : randomState
     },
     github: {
-      name: 'github',
-      url: '/auth/github',
+      name                 : 'github',
+      url                  : '/auth/github',
       authorizationEndpoint: 'https://github.com/login/oauth/authorize',
-      redirectUri: PLATFORM.location.origin,
-      optionalUrlParams: ['scope'],
-      scope: ['user:email'],
-      scopeDelimiter: ' ',
-      oauthType: '2.0',
-      popupOptions: {width: 1020, height: 618}
+      redirectUri          : PLATFORM.location.origin,
+      optionalUrlParams    : ['scope'],
+      scope                : ['user:email'],
+      scopeDelimiter       : ' ',
+      oauthType            : '2.0',
+      popupOptions         : {width: 1020, height: 618}
     },
     instagram: {
-      name: 'instagram',
-      url: '/auth/instagram',
+      name                 : 'instagram',
+      url                  : '/auth/instagram',
       authorizationEndpoint: 'https://api.instagram.com/oauth/authorize',
-      redirectUri: PLATFORM.location.origin,
-      requiredUrlParams: ['scope'],
-      scope: ['basic'],
-      scopeDelimiter: '+',
-      oauthType: '2.0'
+      redirectUri          : PLATFORM.location.origin,
+      requiredUrlParams    : ['scope'],
+      scope                : ['basic'],
+      scopeDelimiter       : '+',
+      oauthType            : '2.0'
     },
     linkedin: {
-      name: 'linkedin',
-      url: '/auth/linkedin',
+      name                 : 'linkedin',
+      url                  : '/auth/linkedin',
       authorizationEndpoint: 'https://www.linkedin.com/uas/oauth2/authorization',
-      redirectUri: PLATFORM.location.origin,
-      requiredUrlParams: ['state'],
-      scope: ['r_emailaddress'],
-      scopeDelimiter: ' ',
-      state: 'STATE',
-      oauthType: '2.0',
-      popupOptions: {width: 527, height: 582}
+      redirectUri          : PLATFORM.location.origin,
+      requiredUrlParams    : ['state'],
+      scope                : ['r_emailaddress'],
+      scopeDelimiter       : ' ',
+      state                : 'STATE',
+      oauthType            : '2.0',
+      popupOptions         : {width: 527, height: 582}
     },
     twitter: {
-      name: 'twitter',
-      url: '/auth/twitter',
+      name                 : 'twitter',
+      url                  : '/auth/twitter',
       authorizationEndpoint: 'https://api.twitter.com/oauth/authenticate',
-      redirectUri: PLATFORM.location.origin,
-      oauthType: '1.0',
-      popupOptions: {width: 495, height: 645}
+      redirectUri          : PLATFORM.location.origin,
+      oauthType            : '1.0',
+      popupOptions         : {width: 495, height: 645}
     },
     twitch: {
-      name: 'twitch',
-      url: '/auth/twitch',
+      name                 : 'twitch',
+      url                  : '/auth/twitch',
       authorizationEndpoint: 'https://api.twitch.tv/kraken/oauth2/authorize',
-      redirectUri: PLATFORM.location.origin,
-      requiredUrlParams: ['scope'],
-      scope: ['user_read'],
-      scopeDelimiter: ' ',
-      display: 'popup',
-      oauthType: '2.0',
-      popupOptions: {width: 500, height: 560}
+      redirectUri          : PLATFORM.location.origin,
+      requiredUrlParams    : ['scope'],
+      scope                : ['user_read'],
+      scopeDelimiter       : ' ',
+      display              : 'popup',
+      oauthType            : '2.0',
+      popupOptions         : {width: 500, height: 560}
     },
     live: {
-      name: 'live',
-      url: '/auth/live',
+      name                 : 'live',
+      url                  : '/auth/live',
       authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
-      redirectUri: PLATFORM.location.origin,
-      requiredUrlParams: ['display', 'scope'],
-      scope: ['wl.emails'],
-      scopeDelimiter: ' ',
-      display: 'popup',
-      oauthType: '2.0',
-      popupOptions: {width: 500, height: 560}
+      redirectUri          : PLATFORM.location.origin,
+      requiredUrlParams    : ['display', 'scope'],
+      scope                : ['wl.emails'],
+      scopeDelimiter       : ' ',
+      display              : 'popup',
+      oauthType            : '2.0',
+      popupOptions         : {width: 500, height: 560}
     },
     yahoo: {
-      name: 'yahoo',
-      url: '/auth/yahoo',
+      name                 : 'yahoo',
+      url                  : '/auth/yahoo',
       authorizationEndpoint: 'https://api.login.yahoo.com/oauth2/request_auth',
-      redirectUri: PLATFORM.location.origin,
-      scope: [],
-      scopeDelimiter: ',',
-      oauthType: '2.0',
-      popupOptions: {width: 559, height: 519}
+      redirectUri          : PLATFORM.location.origin,
+      scope                : [],
+      scopeDelimiter       : ',',
+      oauthType            : '2.0',
+      popupOptions         : {width: 559, height: 519}
     },
     bitbucket: {
-      name: 'bitbucket',
-      url: '/auth/bitbucket',
+      name                 : 'bitbucket',
+      url                  : '/auth/bitbucket',
       authorizationEndpoint: 'https://bitbucket.org/site/oauth2/authorize',
-      redirectUri: PLATFORM.location.origin + '/',
-      requiredUrlParams: ['scope'],
-      scope: ['email'],
-      scopeDelimiter: ' ',
-      oauthType: '2.0',
-      popupOptions: {width: 1028, height: 529}
+      redirectUri          : PLATFORM.location.origin + '/',
+      requiredUrlParams    : ['scope'],
+      scope                : ['email'],
+      scopeDelimiter       : ' ',
+      oauthType            : '2.0',
+      popupOptions         : {width: 1028, height: 529}
     },
     auth0: {
-      name: 'auth0',
-      oauthType: 'auth0-lock',
-      clientId: 'your_client_id',
+      name        : 'auth0',
+      oauthType   : 'auth0-lock',
+      clientId    : 'your_client_id',
       clientDomain: 'your_domain_url',
-      display: 'popup',
-      lockOptions: {
+      display     : 'popup',
+      lockOptions : {
         popup: true
       },
       responseType: 'token',
-      state: randomState
+      state       : randomState
     }
   };
 
@@ -319,6 +318,7 @@ export class BaseConfig {
 
   /* deprecated methods and parameteres */
   /**
+   * @param {string} authToken
    * @deprecated
    */
   set authToken(authToken) {
@@ -333,6 +333,7 @@ export class BaseConfig {
   }
 
   /**
+   * @param {string} responseTokenProp
    * @deprecated
    */
   set responseTokenProp(responseTokenProp) {
@@ -347,6 +348,7 @@ export class BaseConfig {
   }
 
   /**
+   * @param {string} tokenRoot
    * @deprecated
    */
   set tokenRoot(tokenRoot) {
@@ -361,6 +363,7 @@ export class BaseConfig {
   }
 
   /**
+   * @param {string} tokenName
    * @deprecated
    */
   set tokenName(tokenName) {
@@ -375,6 +378,7 @@ export class BaseConfig {
   }
 
   /**
+   * @param {string} tokenPrefix
    * @deprecated
    */
   set tokenPrefix(tokenPrefix) {
@@ -412,9 +416,14 @@ export class BaseConfig {
   }
 }
 
+/**
+ * RandomState
+ *
+ * @returns {Number}
+ */
 function randomState() {
   let rand = Math.random()
-    .toString(36)
+    .tostring(36)
     .substr(2);
 
   return encodeURIComponent(rand);

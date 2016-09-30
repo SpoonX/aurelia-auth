@@ -9,12 +9,12 @@ export class FetchConfig {
   /**
    * Construct the FetchConfig
    *
-   * @param {HttpClient} httpClient
-   * @param {Config} clientConfig
-   * @param {Authentication} authService
-   * @param {BaseConfig} config
+   * @param {HttpClient} httpClient httpClient
+   * @param {Config} clientConfig clientConfig
+   * @param {Authentication} authService authService
+   * @param {BaseConfig} config baseConfig
    */
-  constructor(httpClient, clientConfig, authService, config) {
+  constructor(httpClient: HttpClient, clientConfig: Config, authService: Authentication, config: BaseConfig) {
     this.httpClient   = httpClient;
     this.clientConfig = clientConfig;
     this.authService  = authService;
@@ -24,9 +24,9 @@ export class FetchConfig {
   /**
    * Interceptor for HttpClient
    *
-   * @return {{request: Function, response: Function}}
+   * @return {{request: Function, response: Function}} The interceptor
    */
-  get interceptor() {
+  get interceptor(): {request: Function, response: Function} {
     return {
       request: request => {
         if (!this.config.httpInterceptor || !this.authService.isAuthenticated()) {
@@ -78,9 +78,9 @@ export class FetchConfig {
    *
    * @param {HttpClient|Rest|string[]} client HttpClient, rest client or api endpoint name, or an array thereof
    *
-   * @return {HttpClient[]}
+   * @return {HttpClient[]} The configured client(s)
    */
-  configure(client) {
+  configure(client: HttpClient|Rest|Array<string>): HttpClient|Array<HttpClient> {
     if (Array.isArray(client)) {
       let configuredClients = [];
 

@@ -5,7 +5,7 @@ export class AuthFilterValueConverter {
    * @param  {Boolean}      isAuthenticated   authentication status
    * @return {Boolean}      show/hide element
    */
-  toView(routes, isAuthenticated) {
+  toView(routes: RouteConfig, isAuthenticated: Boolean): Boolean {
     return routes.filter(route => typeof route.config.auth !== 'boolean' || route.config.auth === isAuthenticated);
   }
 }

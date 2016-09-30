@@ -5,9 +5,24 @@ import {Storage} from './storage';
 import {Popup} from './popup';
 import {BaseConfig} from './baseConfig';
 
+/**
+ * OAuth2 service class
+ *
+ * @export
+ * @class OAuth2
+ */
 @inject(Storage, Popup, BaseConfig)
 export class OAuth2 {
-  constructor(storage, popup, config) {
+  /**
+   * Creates an instance of OAuth2.
+   *
+   * @param {Storage} storage The Storage instance
+   * @param {Popup}   popup   The Popup instance
+   * @param {Config}  config  The Config instance
+   *
+   * @memberOf OAuth2
+   */
+  constructor(storage: Storage, popup: Popup, config: BaseConfig) {
     this.storage      = storage;
     this.config       = config;
     this.popup        = popup;
@@ -28,7 +43,16 @@ export class OAuth2 {
     };
   }
 
-  open(options, userData) {
+  /**
+   * Open OAuth2 flow
+   *
+   * @param {{}} options  OAuth2 and dialog options
+   * @param {{}} userData Extra data for the authentications server
+   * @returns {Promise<any>} Authentication server response
+   *
+   * @memberOf OAuth2
+   */
+  open(options: {}, userData: {}): Promise<any> {
     const provider  = extend(true, {}, this.defaults, options);
     const stateName = provider.name + '_state';
 
@@ -61,7 +85,17 @@ export class OAuth2 {
       });
   }
 
-  exchangeForToken(oauthData, userData, provider) {
+  /**
+   * Exchange the code from the external provider by a token from the authentication server
+   *
+   * @param {{}} oauthData The oauth data from the external provider
+   * @param {{}} userData Extra data for the authentications server
+   * @param {string} provider The name of the provider
+   * @returns {Promise<any>} The authenticaion server response with the token
+   *
+   * @memberOf OAuth2
+   */
+  exchangeForToken(oauthData: {}, userData: {}, provider: string): Promise<any> {
     const data = extend(true, {}, userData, {
       clientId   : provider.clientId,
       redirectUri: provider.redirectUri
@@ -73,7 +107,15 @@ export class OAuth2 {
     return this.config.client.post(serverUrl, data, {credentials: credentials});
   }
 
-  buildQuery(provider) {
+  /**
+   * Create the query string for a provider
+   *
+   * @param {string} provider The provider name
+   * @returns {string} The resulting query string
+   *
+   * @memberOf OAuth2
+   */
+  buildQuery(provider: string): string {
     let query = {};
     const urlParams   = ['defaultUrlParams', 'requiredUrlParams', 'optionalUrlParams'];
 
@@ -103,7 +145,15 @@ export class OAuth2 {
     return query;
   }
 
-  close(options) {
+  /**
+   * Send logout request to oath2 rpovider
+   *
+   * @param {[{}]} options Logout option
+   * @returns {Promise<any>} The OAuth provider response
+   *
+   * @memberOf OAuth2
+   */
+  close(options?: {}): Promise<any> {
     const provider  = extend(true, {}, this.defaults, options);
     const url       = provider.logoutEndpoint + '?'
                     + buildQueryString(this.buildLogoutQuery(provider));
@@ -112,13 +162,18 @@ export class OAuth2 {
                     ? popup.eventListener(provider.postLogoutRedirectUri)
                     : popup.pollPopup();
 
-    return openPopup
-      .then(response => {
-        return response;
-      });
+    return openPopup;
   }
 
-  buildLogoutQuery(provider) {
+  /**
+   * Build query for logout request
+   *
+   * @param {string} provider The rpovider name
+   * @returns {string} The logout query string
+   *
+   * @memberOf OAuth2
+   */
+  buildLogoutQuery(provider: string): string {
     let query = {};
     let authResponse = this.storage.get(this.config.storageKey);
 
@@ -136,7 +191,13 @@ export class OAuth2 {
   }
 }
 
-function camelCase(name) {
+/**
+ * camelCase a string
+ *
+ * @param {any} name String to be camelized
+ * @returns {string} The camelized name
+ */
+function camelCase(name: string): string {
   return name.replace(/([:\-_]+(.))/g, function(_, separator, letter, offset) {
     return offset ? letter.toUpperCase() : letter;
   });

@@ -4,19 +4,19 @@ import {BaseConfig} from './baseConfig';
 
 @inject(BaseConfig)
 export class Storage {
-  constructor(config) {
+  constructor(config: BaseConfig) {
     this.config = config;
   }
 
-  get(key) {
+  get(key: string): string {
     return PLATFORM.global[this.config.storage].getItem(key);
   }
 
-  set(key, value) {
+  set(key: string, value: string) {
     PLATFORM.global[this.config.storage].setItem(key, value);
   }
 
-  remove(key) {
+  remove(key: string) {
     PLATFORM.global[this.config.storage].removeItem(key);
   }
 }

@@ -13,12 +13,12 @@ import {AuthenticatedValueConverter} from './authenticatedValueConverter'; // es
 /**
  * Configure the plugin.
  *
+ * @export
  * @param {FrameworkConfiguration} frameworkConfig The FrameworkConfiguration instance
  * @param {{}|Function}            config          The Config instance
  *
- * @return undefined nothing
  */
-export function configure(frameworkConfig, config) {
+export function configure(frameworkConfig: { container: Container, globalResources: (...resources: string[]) => any }, config: {}|Function) {
   // ie9 polyfill
   if (!PLATFORM.location.origin) {
     PLATFORM.location.origin = PLATFORM.location.protocol + '//' + PLATFORM.location.hostname + (PLATFORM.location.port ? ':' + PLATFORM.location.port : '');
