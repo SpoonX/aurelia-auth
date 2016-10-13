@@ -98,6 +98,16 @@ export class Authentication {
     this.storage.remove(this.config.storageKey);
   }
 
+  validateToken(): string {
+    try {
+      jwtDecode( this.accessToken );
+    }catch(err){
+      console.log('Token not valid!');
+      return null;
+    }
+    return true;
+  }
+
   /* get data, update if needed first */
   getAccessToken(): string {
     if (!this.responseAnalyzed) this.getDataFromResponse(this.getResponseObject());
@@ -144,6 +154,10 @@ export class Authentication {
 
   isAuthenticated(): boolean {
     const isTokenExpired = this.isTokenExpired();
+
+    if ( this.validateToken() === null  ) {
+      return undefined;
+    }
 
     if (isTokenExpired === undefined) return !!this.accessToken;
 
