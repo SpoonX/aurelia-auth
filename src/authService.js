@@ -272,21 +272,39 @@ export class AuthService {
  /**
   * Gets authentication status from storage
   *
+  * @param {[Function]} [callback] optional callback (authenticated: boolean) => void executed once the status is determined
+  *
   * @returns {boolean} For Non-JWT and unexpired JWT: true, else: false
   */
-  isAuthenticated(): boolean {
+  isAuthenticated(callback?: (authenticated: boolean) => void): boolean {
     this.authentication.responseAnalyzed = false;
 
     let authenticated = this.authentication.isAuthenticated();
 
-    // auto-update token?
+     // auto-update token?
     if (!authenticated
       && this.config.autoUpdateToken
       && this.authentication.getAccessToken()
       && this.authentication.getRefreshToken()
     ) {
-      this.updateToken().catch(error => logger.warn(error.message));
+      this.updateToken()
+        .then(() => {
+          // has new status now
+          if (typeof callback === 'function') {
+            callback(this.authenticated); // eslint-disable-line callback-return
+          }
+        })
+        .catch(error => logger.warn(error.message));
+
       authenticated = true;
+    } else if (typeof callback === 'function') {
+      PLATFORM.global.setTimeout(() => {
+        try {
+          callback(authenticated); // eslint-disable-line callback-return
+        } catch(error) {
+          logger.warn(error.message);
+        }
+      }, 1);
     }
 
     return authenticated;

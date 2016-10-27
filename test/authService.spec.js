@@ -9,11 +9,20 @@ import {AuthService} from '../src/authService';
 import {Authentication} from '../src/authentication';
 import {AuthFilterValueConverter} from '../src/authFilterValueConverter';
 
+const tokenPast = {
+  payload: {
+    name : 'tokenPast',
+    admin: false,
+    exp  : '0460017154'
+  },
+  jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidG9rZW5QYXN0IiwiYWRtaW4iOmZhbHNlLCJleHAiOiIwNDYwMDE3MTU0In0.Z7QE185hOWL6xxVDmlFpNEmgA-_Vg2bjV9uDRkkVaQY'
+};
+
 const tokenFuture = {
   payload: {
-    name: 'tokenFuture',
+    name : 'tokenFuture',
     admin: true,
-    exp: '2460017154'
+    exp  : '2460017154'
   },
   jwt: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidG9rZW5GdXR1cmUiLCJhZG1pbiI6dHJ1ZSwiZXhwIjoiMjQ2MDAxNzE1NCJ9.iHXLzWGY5U9WwVT4IVRLuKTf65XpgrA1Qq_Jlynv6bc'
 };
@@ -30,11 +39,11 @@ function getContainer() {
     .setDefaultEndpoint('sx/default');
 
   configure({container: container, globalResources: noop}, {
-    endpoint: '',
-    loginRedirect: false,
+    endpoint      : '',
+    loginRedirect : false,
     logoutRedirect: false,
     signupRedirect: false,
-    baseUrl: 'http://localhost:1927/'
+    baseUrl       : 'http://localhost:1927/'
   });
 
   return container;
@@ -43,11 +52,11 @@ function getContainer() {
 let oidcProviderConfig = {
   providers: {
     oidcProvider: {
-      name: 'oidcProvider',
-      oauthType: '2.0',
+      name                 : 'oidcProvider',
+      oauthType            : '2.0',
       postLogoutRedirectUri: 'http://localhost:1927/',
-      logoutEndpoint: 'http://localhost:54540/connect/logout',
-      popupOptions: { width: 1028, height: 529 }
+      logoutEndpoint       : 'http://localhost:54540/connect/logout',
+      popupOptions         : {width: 1028, height: 529}
     }
   }
 };
@@ -79,7 +88,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.authenticated', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -104,7 +112,6 @@ describe('AuthService', () => {
       });
     });
   });
-
 
   describe('.getMe()', () => {
     const container   = getContainer();
@@ -149,7 +156,6 @@ describe('AuthService', () => {
         });
     });
   });
-
 
   describe('.updateMe() with PUT', () => {
     const container   = getContainer();
@@ -204,7 +210,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.updateMe() with PATCH', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -258,7 +263,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.setTimeout()', () => {
     const container = new Container();
     let authService = container.get(AuthService);
@@ -285,7 +289,7 @@ describe('AuthService', () => {
       setTimeout(done, 10);
     });
 
-    it('Should not have timeeout', () => {
+    it('Should not have timeout', () => {
       expect(authService.timeoutID).not.toBe(0);
     });
 
@@ -304,7 +308,7 @@ describe('AuthService', () => {
     };
     let lookupFunctions = {
       bindingBehaviors: name => bindingBehaviors[name],
-      valueConverters: name => valueConverters[name]
+      valueConverters : name => valueConverters[name]
     };
     let bindingSignaler = container.get(BindingSignaler);
 
@@ -343,7 +347,7 @@ describe('AuthService', () => {
 
       // process signal from authService.setTimeout
       expect(authService.timeoutID).not.toBe(0);
-      setTimeout( function() {
+      setTimeout(function() {
         expect(authService.timeoutID).toBe(0);
         expect(target.innerHTML).toBe('false');
         done();
@@ -440,7 +444,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.getAccessToken()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -453,7 +456,6 @@ describe('AuthService', () => {
       expect(token).toBe('some');
     });
   });
-
 
   describe('.getRefreshToken()', () => {
     const container   = getContainer();
@@ -481,6 +483,10 @@ describe('AuthService', () => {
   describe('.isAuthenticated()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
+
+    authService.config.client = {
+      post: () => new Promise(resolve => setTimeout(() => resolve({token: tokenPast.jwt}), 10))
+    };
 
     beforeEach(() => {
       authService.config.useRefreshToken = true;
@@ -524,6 +530,30 @@ describe('AuthService', () => {
       });
     });
 
+    describe('with callback', () => {
+      it('should return true and call with callback(true)', done => {
+        authService.setResponseObject({access_token: tokenFuture.jwt, refresh_token: tokenFuture.jwt});
+
+        let authenticated = authService.isAuthenticated(updatedAuthenticated => {
+          expect(updatedAuthenticated).toBe(true);
+          done();
+        });
+
+        expect(authenticated).toBe(true);
+      });
+
+      it('should return true and call with callback(false) after refreshing', done => {
+        authService.setResponseObject({access_token: tokenPast.jwt, refresh_token: tokenFuture.jwt});
+
+        let authenticated = authService.isAuthenticated(updatedAuthenticated => {
+          expect(updatedAuthenticated).toBe(false);
+          done();
+        });
+
+        expect(authenticated).toBe(true);
+      });
+    });
+
     describe('with autoUpdateToken=true', () => {
       it('should return boolean true', () => {
         authService.setResponseObject({token: 'some', refresh_token: 'another'});
@@ -552,7 +582,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.isTokenExpired()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -566,7 +595,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.getTokenPayload()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -579,7 +607,6 @@ describe('AuthService', () => {
       expect(payload).toBe('payload');
     });
   });
-
 
   describe('.updateToken()', () => {
     const container   = new Container();
@@ -677,7 +704,6 @@ describe('AuthService', () => {
         });
     });
   });
-
 
   describe('.signup()', () => {
     const container = getContainer();
@@ -797,7 +823,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('.logout()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
@@ -840,7 +865,7 @@ describe('AuthService', () => {
     });
 
     it('should call oAuth2.close() if logoutEndpoint defined', done => {
-      spyOn(authService.authentication.oAuth2, 'close').and.returnValue(Promise.resolve({ state: 'ThisIsTheState' }));
+      spyOn(authService.authentication.oAuth2, 'close').and.returnValue(Promise.resolve({state: 'ThisIsTheState'}));
       authService.config.logoutRedirect = false;
       authService.authentication.storage.set('oidcProvider_state', 'ThisIsTheState');
       authService.logout(0, undefined, 'oidcProvider')
@@ -854,8 +879,8 @@ describe('AuthService', () => {
     });
 
     it('return reject Promise if states differ', done => {
-      spyOn(authService.authentication.oAuth2, 'close').and.callFake( () => {
-        return Promise.resolve({ state: 'ThisIsTheState' });
+      spyOn(authService.authentication.oAuth2, 'close').and.callFake(() => {
+        return Promise.resolve({state: 'ThisIsTheState'});
       });
       authService.authentication.storage.set('oidcProvider_state', 'ThisIsNotTheState');
       authService.logout(0, undefined, 'oidcProvider')
@@ -874,14 +899,14 @@ describe('AuthService', () => {
     const authService = container.get(AuthService);
 
     authService.authentication.oAuth1.open = (provider, userData) => Promise.resolve({
-      provider: provider,
-      userData: userData,
+      provider    : provider,
+      userData    : userData,
       access_token: 'oauth1'
     });
 
     authService.authentication.oAuth2.open = (provider, userData) => Promise.resolve({
-      provider: provider,
-      userData: userData,
+      provider    : provider,
+      userData    : userData,
       access_token: 'oauth2'
     });
 
@@ -934,7 +959,6 @@ describe('AuthService', () => {
         });
     });
   });
-
 
   describe('.unlink()', () => {
     const container   = getContainer();

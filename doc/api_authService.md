@@ -222,11 +222,17 @@ let currentToken = this.authService.getRefreshToken();
 
 ----------
 
-### .isAuthenticated()
+### .isAuthenticated(callback)
 
 Checks if there is a (valid) token in storage. If the token is isExpired and  BaseConfig.autoUpdateToken===true, it returns true and a new access token automatically requested using the refesh_token. If you use it in a getter, aurelia will dirty check on uodates. Hence, may better either use .authenticated or use the binding signal 'authentication-change' to ensure udpdates.
 
 CAUTION: When you cancel or manually set the timeout, .isAuthenticated and .authenticated could yield different results.
+
+#### Parameters
+
+| Parameter  | Type                             | Description                                              |
+| ---------- | -------------------------------- | -------------------------------------------------------- |
+| [callback] | (authenticated: boolean) => void | optional callback executed once the status is determined |
 
 #### Returns
 
