@@ -281,7 +281,7 @@ export class AuthService {
 
     let authenticated = this.authentication.isAuthenticated();
 
-     // auto-update token?
+    // auto-update token?
     if (!authenticated
       && this.config.autoUpdateToken
       && this.authentication.getAccessToken()
@@ -289,7 +289,7 @@ export class AuthService {
     ) {
       this.updateToken()
         .then(() => {
-          // has new status now
+          // call callback with now updated status
           if (typeof callback === 'function') {
             callback(this.authenticated); // eslint-disable-line callback-return
           }
@@ -298,6 +298,7 @@ export class AuthService {
 
       authenticated = true;
     } else if (typeof callback === 'function') {
+      // ensure consistent execution order with a 'delayed' callback
       PLATFORM.global.setTimeout(() => {
         try {
           callback(authenticated); // eslint-disable-line callback-return
