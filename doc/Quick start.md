@@ -30,7 +30,7 @@ Here is a sample of a close to minimal custom setting:
 ```js
 export default {
     endpoint: 'auth',
-    configureEndpoints: ['auth', 'protected-api']
+    configureEndpoints: ['auth', 'protected-api'],
     loginUrl: 'login',  
     signupUrl: 'users',
     profileUrl: 'me',
