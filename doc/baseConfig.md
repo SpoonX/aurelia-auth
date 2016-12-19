@@ -39,7 +39,7 @@ baseUrl = '';
 loginUrl = '/auth/login';
 // The API endpoint to which logout requests are sent (not needed for jwt)
 logoutUrl = null;
-// The HTTP method used for 'unlink' requests (Options: 'get' or 'post')
+// The HTTP method used for 'logout' requests (Options: 'get' or 'post')
 logoutMethod = 'get';
 // The API endpoint to which signup requests are sent
 signupUrl = '/auth/signup';
