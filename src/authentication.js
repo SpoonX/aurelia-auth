@@ -143,7 +143,7 @@ export class Authentication {
   }
 
   isAuthenticated(): boolean {
-    return !!this.accessToken && !this.isTokenExpired();
+    return !!this.getAccessToken() && !this.isTokenExpired();
   }
 
   /* get and set from response */
