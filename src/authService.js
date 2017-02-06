@@ -503,8 +503,10 @@ export class AuthService {
           });
       }
     } else {
-      return this.config.logoutUrl
-        ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout)
+     return this.config.logoutUrl
+        ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl))
+            .then(localLogout)
+            .catch(localLogout)
         : localLogout();
     }
   }
