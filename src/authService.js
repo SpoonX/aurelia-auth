@@ -86,13 +86,10 @@ export class AuthService {
     }
     
     // do not handle storage events in case of auto refresh tokens are enabled
-    if(this.config.autoUpdateToken
-      && this.authentication.getAccessToken()
-      && this.authentication.getRefreshToken())
-      {
-        return;
-      }
-
+    if(this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
+      return;
+    }
+    
     logger.info('Stored token changed event');
 
     // IE runs the event handler before updating the storage value. Update it now.
