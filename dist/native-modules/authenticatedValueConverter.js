@@ -1,11 +1,17 @@
+'use strict';
+
+exports.__esModule = true;
+exports.AuthenticatedValueConverter = undefined;
+
 var _dec, _class;
 
+var _aureliaDependencyInjection = require('aurelia-dependency-injection');
+
+var _aureliaAuthentication = require('./aurelia-authentication');
 
 
-import { inject } from 'aurelia-dependency-injection';
-import { AuthService } from './aurelia-authentication';
 
-export var AuthenticatedValueConverter = (_dec = inject(AuthService), _dec(_class = function () {
+var AuthenticatedValueConverter = exports.AuthenticatedValueConverter = (_dec = (0, _aureliaDependencyInjection.inject)(_aureliaAuthentication.AuthService), _dec(_class = function () {
   function AuthenticatedValueConverter(authService) {
     
 
