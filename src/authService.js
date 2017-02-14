@@ -1,13 +1,13 @@
 /* eslint-disable max-lines */
-import {PLATFORM} from 'aurelia-pal';
-import {inject} from 'aurelia-dependency-injection';
-import {deprecated} from 'aurelia-metadata';
-import {EventAggregator} from 'aurelia-event-aggregator';
-import {BindingSignaler} from 'aurelia-templating-resources';
-import {logger} from './logger';
-import {Rest} from 'aurelia-api';
-import {Authentication} from './authentication';
-import {BaseConfig} from './baseConfig';
+import { PLATFORM } from 'aurelia-pal';
+import { inject } from 'aurelia-dependency-injection';
+import { deprecated } from 'aurelia-metadata';
+import { EventAggregator } from 'aurelia-event-aggregator';
+import { BindingSignaler } from 'aurelia-templating-resources';
+import { logger } from './logger';
+import { Rest } from 'aurelia-api';
+import { Authentication } from './authentication';
+import { BaseConfig } from './baseConfig';
 
 @inject(Authentication, BaseConfig, BindingSignaler, EventAggregator)
 export class AuthService {
@@ -30,7 +30,7 @@ export class AuthService {
    *
    * @param  {boolean}
    */
-  authenticated: boolean  = false;
+  authenticated: boolean = false;
 
   /**
    * The currently set timeoutID
@@ -48,15 +48,15 @@ export class AuthService {
    * @param  {EventAggregator} eventAggregator The EventAggregator instance to be used
    */
   constructor(authentication: Authentication, config: BaseConfig, bindingSignaler: BindingSignaler, eventAggregator: EventAggregator) {
-    this.authentication  = authentication;
-    this.config          = config;
+    this.authentication = authentication;
+    this.config = config;
     this.bindingSignaler = bindingSignaler;
     this.eventAggregator = eventAggregator;
 
     // get token stored in previous format over
     const oldStorageKey = config.tokenPrefix
-                        ? `${config.tokenPrefix}_${config.tokenName}`
-                        : config.tokenName;
+      ? `${config.tokenPrefix}_${config.tokenName}`
+      : config.tokenName;
     const oldToken = authentication.storage.get(oldStorageKey);
 
     if (oldToken) {
@@ -84,12 +84,12 @@ export class AuthService {
     if (event.key !== this.config.storageKey || event.newValue === event.oldValue) {
       return;
     }
-    
+
     // do not handle storage events in case of auto refresh tokens are enabled
-		if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
-			return;
-		}
-    
+    if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
+      return;
+    }
+
     logger.info('Stored token changed event');
 
     // IE runs the event handler before updating the storage value. Update it now.
@@ -222,9 +222,9 @@ export class AuthService {
    *
    * @memberOf AuthService
    */
-  getMe(criteriaOrId?: {}|number|string): Promise<any> {
+  getMe(criteriaOrId?: {} | number | string): Promise<any> {
     if (typeof criteriaOrId === 'string' || typeof criteriaOrId === 'number') {
-      criteriaOrId = {id: criteriaOrId};
+      criteriaOrId = { id: criteriaOrId };
     }
 
     return this.client.find(this.config.joinBase(this.config.profileUrl), criteriaOrId);
@@ -238,9 +238,9 @@ export class AuthService {
    *
    * @return {Promise<any>} The server response
    */
-  updateMe(body: {}, criteriaOrId?: {}|number|string): Promise<any> {
+  updateMe(body: {}, criteriaOrId?: {} | number | string): Promise<any> {
     if (typeof criteriaOrId === 'string' || typeof criteriaOrId === 'number') {
-      criteriaOrId = {id: criteriaOrId};
+      criteriaOrId = { id: criteriaOrId };
     }
     if (this.config.profileMethod === 'put') {
       return this.client.update(this.config.joinBase(this.config.profileUrl), criteriaOrId, body);
@@ -258,7 +258,7 @@ export class AuthService {
     return this.authentication.getAccessToken();
   }
 
-  @deprecated({message: 'Use .getAccessToken() instead.'})
+  @deprecated({ message: 'Use .getAccessToken() instead.' })
   getCurrentToken(): string {
     return this.getAccessToken();
   }
@@ -281,13 +281,13 @@ export class AuthService {
     return this.authentication.getIdToken();
   }
 
- /**
-  * Gets authentication status from storage
-  *
-  * @param {[Function]} [callback] optional callback (authenticated: boolean) => void executed once the status is determined
-  *
-  * @returns {boolean} For Non-JWT and unexpired JWT: true, else: false
-  */
+  /**
+   * Gets authentication status from storage
+   *
+   * @param {[Function]} [callback] optional callback (authenticated: boolean) => void executed once the status is determined
+   *
+   * @returns {boolean} For Non-JWT and unexpired JWT: true, else: false
+   */
   isAuthenticated(callback?: (authenticated: boolean) => void): boolean {
     this.authentication.responseAnalyzed = false;
 
@@ -314,7 +314,7 @@ export class AuthService {
       PLATFORM.global.setTimeout(() => {
         try {
           callback(authenticated); // eslint-disable-line callback-return
-        } catch(error) {
+        } catch (error) {
           logger.warn(error.message);
         }
       }, 1);
@@ -341,11 +341,11 @@ export class AuthService {
     return this.authentication.getTtl();
   }
 
- /**
-  * Gets exp from token payload and compares to current time
-  *
-  * @returns {boolean} Returns (ttl > 0)? for JWT, undefined other tokens
-  */
+  /**
+   * Gets exp from token payload and compares to current time
+   *
+   * @returns {boolean} Returns (ttl > 0)? for JWT, undefined other tokens
+   */
   isTokenExpired(): boolean {
     return this.authentication.isTokenExpired();
   }
@@ -372,14 +372,14 @@ export class AuthService {
     if (this.authentication.updateTokenCallstack.length === 0) {
       let content = {
         grant_type: 'refresh_token',
-        client_id : this.config.clientId ? this.config.clientId : undefined
+        client_id: this.config.clientId ? this.config.clientId : undefined
       };
 
       content[this.config.refreshTokenSubmitProp] = this.authentication.getRefreshToken();
 
       this.client.post(this.config.joinBase(this.config.refreshTokenUrl
-                                            ? this.config.refreshTokenUrl
-                                            : this.config.loginUrl), content)
+        ? this.config.refreshTokenUrl
+        : this.config.loginUrl), content)
         .then(response => {
           this.setResponseObject(response);
           this.authentication.resolveUpdateTokenCallstack(this.isAuthenticated());
@@ -404,20 +404,20 @@ export class AuthService {
    *
    * @return {Promise<any>} Server response as Object
    */
-  signup(displayNameOrCredentials: string|{}, emailOrOptions?: string|{}, passwordOrRedirectUri?: string, options?: {}, redirectUri?: string): Promise<any> {
+  signup(displayNameOrCredentials: string | {}, emailOrOptions?: string | {}, passwordOrRedirectUri?: string, options?: {}, redirectUri?: string): Promise<any> {
     let normalized = {};
 
     if (typeof displayNameOrCredentials === 'object') {
       normalized.credentials = displayNameOrCredentials;
-      normalized.options     = emailOrOptions;
+      normalized.options = emailOrOptions;
       normalized.redirectUri = passwordOrRedirectUri;
     } else {
       normalized.credentials = {
         'displayName': displayNameOrCredentials,
-        'email'      : emailOrOptions,
-        'password'   : passwordOrRedirectUri
+        'email': emailOrOptions,
+        'password': passwordOrRedirectUri
       };
-      normalized.options     = options;
+      normalized.options = options;
       normalized.redirectUri = redirectUri;
     }
 
@@ -442,19 +442,19 @@ export class AuthService {
    *
    * @return {Promise<Object>|Promise<Error>}    Server response as Object
    */
-  login(emailOrCredentials: string|{}, passwordOrOptions?: string|{}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any> {
+  login(emailOrCredentials: string | {}, passwordOrOptions?: string | {}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any> {
     let normalized = {};
 
     if (typeof emailOrCredentials === 'object') {
       normalized.credentials = emailOrCredentials;
-      normalized.options     = passwordOrOptions;
+      normalized.options = passwordOrOptions;
       normalized.redirectUri = optionsOrRedirectUri;
     } else {
       normalized.credentials = {
-        'email'   : emailOrCredentials,
+        'email': emailOrCredentials,
         'password': passwordOrOptions
       };
-      normalized.options     = optionsOrRedirectUri;
+      normalized.options = optionsOrRedirectUri;
       normalized.redirectUri = redirectUri;
     }
 
@@ -508,10 +508,10 @@ export class AuthService {
           });
       }
     } else {
-     return this.config.logoutUrl
+      return this.config.logoutUrl
         ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl))
-            .then(localLogout)
-            .catch(localLogout)
+          .then(localLogout)
+          .catch(localLogout)
         : localLogout();
     }
   }
