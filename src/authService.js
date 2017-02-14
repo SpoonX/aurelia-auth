@@ -84,6 +84,14 @@ export class AuthService {
     if (event.key !== this.config.storageKey || event.newValue === event.oldValue) {
       return;
     }
+    
+    // do not handle storage events in case of auto refresh tokens are enabled
+    if(this.config.autoUpdateToken
+      && this.authentication.getAccessToken()
+      && this.authentication.getRefreshToken())
+      {
+        return;
+      }
 
     logger.info('Stored token changed event');
 
