@@ -86,7 +86,7 @@ export class AuthService {
     }
 
     // do not handle storage events in case of auto refresh tokens are enabled
-    if(this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
+    if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
       return;
     }
 
