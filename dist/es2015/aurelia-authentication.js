@@ -967,9 +967,9 @@ export let Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
     }
 
     if (typeof redirectUrl === 'string') {
-      PLATFORM.location.href = encodeURI(redirectUrl + (query ? `?${ buildQueryString(query) }` : ''));
+      PLATFORM.location.href = encodeURI(redirectUrl + (query ? `?${buildQueryString(query)}` : ''));
     } else if (defaultRedirectUrl) {
-      PLATFORM.location.href = defaultRedirectUrl + (query ? `?${ buildQueryString(query) }` : '');
+      PLATFORM.location.href = defaultRedirectUrl + (query ? `?${buildQueryString(query)}` : '');
     }
   }
 }, (_applyDecoratedDescriptor(_class7.prototype, 'getLoginRoute', [_dec6], Object.getOwnPropertyDescriptor(_class7.prototype, 'getLoginRoute'), _class7.prototype), _applyDecoratedDescriptor(_class7.prototype, 'getLoginRedirect', [_dec7], Object.getOwnPropertyDescriptor(_class7.prototype, 'getLoginRedirect'), _class7.prototype), _applyDecoratedDescriptor(_class7.prototype, 'getLoginUrl', [_dec8], Object.getOwnPropertyDescriptor(_class7.prototype, 'getLoginUrl'), _class7.prototype), _applyDecoratedDescriptor(_class7.prototype, 'getSignupUrl', [_dec9], Object.getOwnPropertyDescriptor(_class7.prototype, 'getSignupUrl'), _class7.prototype), _applyDecoratedDescriptor(_class7.prototype, 'getProfileUrl', [_dec10], Object.getOwnPropertyDescriptor(_class7.prototype, 'getProfileUrl'), _class7.prototype), _applyDecoratedDescriptor(_class7.prototype, 'getToken', [_dec11], Object.getOwnPropertyDescriptor(_class7.prototype, 'getToken'), _class7.prototype)), _class7)) || _class6);
@@ -981,6 +981,10 @@ export let AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
 
     this.storageEventHandler = event => {
       if (event.key !== this.config.storageKey || event.newValue === event.oldValue) {
+        return;
+      }
+
+      if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
         return;
       }
 
@@ -1015,7 +1019,7 @@ export let AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
     this.bindingSignaler = bindingSignaler;
     this.eventAggregator = eventAggregator;
 
-    const oldStorageKey = config.tokenPrefix ? `${ config.tokenPrefix }_${ config.tokenName }` : config.tokenName;
+    const oldStorageKey = config.tokenPrefix ? `${config.tokenPrefix}_${config.tokenName}` : config.tokenName;
     const oldToken = authentication.storage.get(oldStorageKey);
 
     if (oldToken) {
@@ -1095,7 +1099,7 @@ export let AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
       this.bindingSignaler.signal('authentication-change');
       this.eventAggregator.publish('authentication-change', this.authenticated);
 
-      logger.info(`Authorization changed to: ${ this.authenticated }`);
+      logger.info(`Authorization changed to: ${this.authenticated}`);
     }
   }
 
@@ -1282,7 +1286,7 @@ export let AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
         });
       }
     } else {
-      return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout) : localLogout();
+      return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout).catch(localLogout) : localLogout();
     }
   }
 
@@ -1368,7 +1372,7 @@ export let FetchConfig = (_dec16 = inject(HttpClient, Config, AuthService, BaseC
         let token = this.authService.getAccessToken();
 
         if (this.config.authTokenType) {
-          token = `${ this.config.authTokenType } ${ token }`;
+          token = `${this.config.authTokenType} ${token}`;
         }
 
         request.headers.set(this.config.authHeader, token);
@@ -1397,7 +1401,7 @@ export let FetchConfig = (_dec16 = inject(HttpClient, Config, AuthService, BaseC
             let token = this.authService.getAccessToken();
 
             if (this.config.authTokenType) {
-              token = `${ this.config.authTokenType } ${ token }`;
+              token = `${this.config.authTokenType} ${token}`;
             }
 
             request.headers.set(this.config.authHeader, token);
@@ -1424,7 +1428,7 @@ export let FetchConfig = (_dec16 = inject(HttpClient, Config, AuthService, BaseC
       const endpoint = this.clientConfig.getEndpoint(client);
 
       if (!endpoint) {
-        throw new Error(`There is no '${ client || 'default' }' endpoint registered.`);
+        throw new Error(`There is no '${client || 'default'}' endpoint registered.`);
       }
       client = endpoint.client;
     } else if (client instanceof Rest) {
@@ -1453,8 +1457,8 @@ export function configure(frameworkConfig, config) {
   }
 
   for (let converter of baseConfig.globalValueConverters) {
-    frameworkConfig.globalResources(`./${ converter }`);
-    logger.info(`Add globalResources value-converter: ${ converter }`);
+    frameworkConfig.globalResources(`./${converter}`);
+    logger.info(`Add globalResources value-converter: ${converter}`);
   }
   const fetchConfig = frameworkConfig.container.get(FetchConfig);
   const clientConfig = frameworkConfig.container.get(Config);
@@ -1472,7 +1476,7 @@ export function configure(frameworkConfig, config) {
       const endpoint = clientConfig.getEndpoint(baseConfig.endpoint);
 
       if (!endpoint) {
-        throw new Error(`There is no '${ baseConfig.endpoint || 'default' }' endpoint registered.`);
+        throw new Error(`There is no '${baseConfig.endpoint || 'default'}' endpoint registered.`);
       }
       client = endpoint;
     } else if (baseConfig.endpoint instanceof HttpClient) {

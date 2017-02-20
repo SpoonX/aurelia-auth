@@ -1187,6 +1187,10 @@ System.register(['extend', 'jwt-decode', 'aurelia-pal', 'aurelia-path', 'aurelia
               return;
             }
 
+            if (_this8.config.autoUpdateToken && _this8.authentication.getAccessToken() && _this8.authentication.getRefreshToken()) {
+              return;
+            }
+
             logger.info('Stored token changed event');
 
             if (event.newValue) {
@@ -1493,7 +1497,7 @@ System.register(['extend', 'jwt-decode', 'aurelia-pal', 'aurelia-path', 'aurelia
               });
             }
           } else {
-            return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout) : localLogout();
+            return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout).catch(localLogout) : localLogout();
           }
         };
 
@@ -1618,19 +1622,13 @@ System.register(['extend', 'jwt-decode', 'aurelia-pal', 'aurelia-path', 'aurelia
           var _this17 = this;
 
           if (Array.isArray(client)) {
-            var _ret = function () {
-              var configuredClients = [];
+            var configuredClients = [];
 
-              client.forEach(function (toConfigure) {
-                configuredClients.push(_this17.configure(toConfigure));
-              });
+            client.forEach(function (toConfigure) {
+              configuredClients.push(_this17.configure(toConfigure));
+            });
 
-              return {
-                v: configuredClients
-              };
-            }();
-
-            if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+            return configuredClients;
           }
 
           if (typeof client === 'string') {
