@@ -1,3 +1,18 @@
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/spoonx/aurelia-authentication/compare/v3.2.0...v3.3.0) (2017-03-06)
+
+
+### Bug Fixes
+
+* **authService:** handle logout also if server logoutUrl fails ([403a498](https://github.com/spoonx/aurelia-authentication/commit/403a498))
+
+
+### Features
+
+* **authentication:** include response object in 'Token not found in response' errors ([d5131ca](https://github.com/spoonx/aurelia-authentication/commit/d5131ca))
+
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/spoonx/aurelia-authentication/compare/v3.1.0...v3.2.0) (2017-01-13)
 

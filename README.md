@@ -113,7 +113,7 @@ Set your custom configuration. You can find all options and the default values i
 /* authConfig.js */
 var baseConfig = {
     endpoint: 'auth',             // use 'auth' endpoint for the auth server
-    configureEndpoints: ['auth']  // add Authorization header to 'auth' endpoint
+    configureEndpoints: ['auth'], // add Authorization header to 'auth' endpoint
     facebook: {
         clientId: 'your client id' // set your third-party providers client ids
     }
