@@ -1,3 +1,13 @@
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/spoonx/aurelia-authentication/compare/v3.3.0...v3.4.0) (2017-03-20)
+
+
+### Features
+
+* **authService:** support empty login request ([0d8f258](https://github.com/spoonx/aurelia-authentication/commit/0d8f258))
+
+
+
 <a name="3.3.0"></a>
 # [3.3.0](https://github.com/spoonx/aurelia-authentication/compare/v3.2.0...v3.3.0) (2017-03-06)
 

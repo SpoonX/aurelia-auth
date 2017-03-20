@@ -1327,7 +1327,7 @@ export var AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
       normalized.credentials = emailOrCredentials;
       normalized.options = passwordOrOptions;
       normalized.redirectUri = optionsOrRedirectUri;
-    } else {
+    } else if (typeof emailOrCredentials === 'string') {
       normalized.credentials = {
         'email': emailOrCredentials,
         'password': passwordOrOptions

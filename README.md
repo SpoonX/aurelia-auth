@@ -30,7 +30,7 @@ The [changelog](doc/changelog.md) provides you with information about important 
 
 ## Installation
 
-### Aureli-Cli
+### Aurelia-Cli
 
 Run `npm i aurelia-authentication --save` from your project root.
 

@@ -1452,7 +1452,7 @@ System.register(['extend', 'jwt-decode', 'aurelia-pal', 'aurelia-path', 'aurelia
             normalized.credentials = emailOrCredentials;
             normalized.options = passwordOrOptions;
             normalized.redirectUri = optionsOrRedirectUri;
-          } else {
+          } else if (typeof emailOrCredentials === 'string') {
             normalized.credentials = {
               'email': emailOrCredentials,
               'password': passwordOrOptions
