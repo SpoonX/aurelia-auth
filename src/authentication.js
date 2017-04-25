@@ -221,14 +221,28 @@ export class Authentication {
       const tokenRootData = tokenRoot && tokenRoot.split('.').reduce((o, x) => o[x], responseTokenProp);
       const token = tokenRootData ? tokenRootData[tokenName] : responseTokenProp[tokenName];
 
-      if (!token) throw new Error('Token not found in response');
+      if (!token) {
+        // if the token is not found in the response,
+        // throw an error along with the response object as a key
+        let error = new Error('Token not found in response');
+
+        error.responseObject = response;
+        throw error;
+      }
 
       return token;
     }
 
     const token = response[tokenName] === undefined ? null : response[tokenName];
 
-    if (!token) throw new Error('Token not found in response');
+    if (!token) {
+        // if the token is not found in the response,
+        // throw an error along with the response object as a key
+      let error = new Error('Token not found in response');
+
+      error.responseObject = response;
+      throw error;
+    }
 
     return token;
   }

@@ -570,7 +570,7 @@ export declare class AuthService {
      *
      * @return {Promise<Object>|Promise<Error>}    Server response as Object
      */
-  login(emailOrCredentials: string | {}, passwordOrOptions?: string | {}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any>;
+  login(emailOrCredentials?: string | {}, passwordOrOptions?: string | {}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any>;
   
   /**
      * Logout locally and redirect to redirectUri (if set) or redirectUri of config.

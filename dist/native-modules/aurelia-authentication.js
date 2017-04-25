@@ -938,14 +938,24 @@ export var Authentication = (_dec5 = inject(Storage, BaseConfig, OAuth1, OAuth2,
       }, responseTokenProp);
       var _token = tokenRootData ? tokenRootData[tokenName] : responseTokenProp[tokenName];
 
-      if (!_token) throw new Error('Token not found in response');
+      if (!_token) {
+        var error = new Error('Token not found in response');
+
+        error.responseObject = response;
+        throw error;
+      }
 
       return _token;
     }
 
     var token = response[tokenName] === undefined ? null : response[tokenName];
 
-    if (!token) throw new Error('Token not found in response');
+    if (!token) {
+      var _error = new Error('Token not found in response');
+
+      _error.responseObject = response;
+      throw _error;
+    }
 
     return token;
   };
@@ -1059,6 +1069,12 @@ export var AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
 
     this.storageEventHandler = function (event) {
       if (event.key !== _this8.config.storageKey || event.newValue === event.oldValue) {
+        return;
+      }
+
+      if (_this8.config.autoUpdateToken && _this8.authentication.getAccessToken() && _this8.authentication.getRefreshToken()) {
+        _this8.authentication.updateAuthenticated();
+
         return;
       }
 
@@ -1317,7 +1333,7 @@ export var AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
       normalized.credentials = emailOrCredentials;
       normalized.options = passwordOrOptions;
       normalized.redirectUri = optionsOrRedirectUri;
-    } else {
+    } else if (typeof emailOrCredentials === 'string') {
       normalized.credentials = {
         'email': emailOrCredentials,
         'password': passwordOrOptions
@@ -1368,7 +1384,7 @@ export var AuthService = (_dec12 = inject(Authentication, BaseConfig, BindingSig
         });
       }
     } else {
-      return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout) : localLogout();
+      return this.config.logoutUrl ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout).catch(localLogout) : localLogout();
     }
   };
 

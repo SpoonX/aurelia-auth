@@ -38,3 +38,31 @@ import {Cookie} from 'aurelia-cookie';
       });
   };
 ```
+
+## Setting auth0 lock params
+In case you need to get more than just an accesstoken, you must modify the lockOptions as shown below. Parameters are described here: [Lock Authentication params](https://auth0.com/docs/libraries/lock/v10/sending-authentication-parameters)
+
+```
+const config = {
+    baseUrl: endpoints.auth,
+    configureEndpoints: ['auth', 'api'],
+    providers: {
+        auth0: {
+            name: 'auth0',
+            oauthType: 'auth0-lock',
+            responseType: 'token',
+            clientId: '.......',
+            clientDomain: '..........auth0.com',
+            lockOptions: {
+                popup: false,
+                auth: {
+                    params: { scope: 'openid email name picture' }
+               }
+            },
+            state: function () {
+                return Math.random().toString(36).substr(2);
+            }
+        },
+    }
+};
+```

@@ -1,3 +1,38 @@
+<a name="3.4.1"></a>
+## [3.4.1](https://github.com/spoonx/aurelia-authentication/compare/v3.4.0...v3.4.1) (2017-03-23)
+
+
+### Bug Fixes
+
+* **authService:** storageEventHandler change ([01d3662](https://github.com/spoonx/aurelia-authentication/commit/01d3662))
+
+
+
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/spoonx/aurelia-authentication/compare/v3.3.0...v3.4.0) (2017-03-20)
+
+
+### Features
+
+* **authService:** support empty login request ([0d8f258](https://github.com/spoonx/aurelia-authentication/commit/0d8f258))
+
+
+
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/spoonx/aurelia-authentication/compare/v3.2.0...v3.3.0) (2017-03-06)
+
+
+### Bug Fixes
+
+* **authService:** handle logout also if server logoutUrl fails ([403a498](https://github.com/spoonx/aurelia-authentication/commit/403a498))
+
+
+### Features
+
+* **authentication:** include response object in 'Token not found in response' errors ([d5131ca](https://github.com/spoonx/aurelia-authentication/commit/d5131ca))
+
+
+
 <a name="3.2.0"></a>
 # [3.2.0](https://github.com/spoonx/aurelia-authentication/compare/v3.1.0...v3.2.0) (2017-01-13)
 

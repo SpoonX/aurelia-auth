@@ -40,7 +40,7 @@ export class App {
 
 ### An own Fetch Client, Rest Client or endpoint
 
-You also can configure you own Fetch Client instance:
+You also can configure your own Fetch Client instance:
 
 ```js
 this.fetchConfig.configure(new HttpClient);
@@ -52,7 +52,7 @@ Or a Rest Client instance:
 this.fetchConfig.configure(new Rest);
 ```
 
-Or an enpoint by name:
+Or an endpoint by name:
 
 ```js
 this.fetchConfig.configure('api');

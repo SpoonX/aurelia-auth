@@ -1138,14 +1138,28 @@ export class Authentication {
       const tokenRootData = tokenRoot && tokenRoot.split('.').reduce((o, x) => o[x], responseTokenProp);
       const token = tokenRootData ? tokenRootData[tokenName] : responseTokenProp[tokenName];
 
-      if (!token) throw new Error('Token not found in response');
+      if (!token) {
+        // if the token is not found in the response,
+        // throw an error along with the response object as a key
+        let error = new Error('Token not found in response');
+
+        error.responseObject = response;
+        throw error;
+      }
 
       return token;
     }
 
     const token = response[tokenName] === undefined ? null : response[tokenName];
 
-    if (!token) throw new Error('Token not found in response');
+    if (!token) {
+        // if the token is not found in the response,
+        // throw an error along with the response object as a key
+      let error = new Error('Token not found in response');
+
+      error.responseObject = response;
+      throw error;
+    }
 
     return token;
   }
@@ -1322,6 +1336,14 @@ export class AuthService {
    */
   storageEventHandler = (event: StorageEvent) => {
     if (event.key !== this.config.storageKey || event.newValue === event.oldValue) {
+      return;
+    }
+
+    // in case auto refresh tokens are enabled
+    if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
+      // we just need to check the status of the updated token we have in storage
+      this.authentication.updateAuthenticated();
+
       return;
     }
 
@@ -1677,14 +1699,14 @@ export class AuthService {
    *
    * @return {Promise<Object>|Promise<Error>}    Server response as Object
    */
-  login(emailOrCredentials: string|{}, passwordOrOptions?: string|{}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any> {
+  login(emailOrCredentials?: string|{}, passwordOrOptions?: string|{}, optionsOrRedirectUri?: {}, redirectUri?: string): Promise<any> {
     let normalized = {};
 
     if (typeof emailOrCredentials === 'object') {
       normalized.credentials = emailOrCredentials;
       normalized.options     = passwordOrOptions;
       normalized.redirectUri = optionsOrRedirectUri;
-    } else {
+    } else if (typeof emailOrCredentials === 'string') {
       normalized.credentials = {
         'email'   : emailOrCredentials,
         'password': passwordOrOptions
@@ -1743,8 +1765,10 @@ export class AuthService {
           });
       }
     } else {
-      return this.config.logoutUrl
-        ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl)).then(localLogout)
+     return this.config.logoutUrl
+        ? this.client.request(this.config.logoutMethod, this.config.joinBase(this.config.logoutUrl))
+            .then(localLogout)
+            .catch(localLogout)
         : localLogout();
     }
   }
