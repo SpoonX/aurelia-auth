@@ -52,6 +52,12 @@ export class FetchConfig {
           if (response.status !== 401) {
             return resolve(response);
           }
+
+          // when we get a 401 and are not logged in, there's not much to do except reject the request
+          if (!this.authService.authenticated) {
+            return reject(response);
+          }
+
           // logout when server invalidated the authorization token but the token itself is still valid
           if (this.config.httpInterceptor && this.config.logoutOnInvalidtoken && !this.authService.isTokenExpired()) {
             return reject(this.authService.logout());
