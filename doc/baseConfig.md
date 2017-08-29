@@ -88,6 +88,9 @@ clientId = false;
 clientSecret = null;
 // The property from which to get the refresh token after a successful token refresh
 refreshTokenProp = 'refresh_token';
+// The property name used to send the existing token when refreshing `{ "refreshTokenSubmitProp": '...' }`
+refreshTokenSubmitProp = 'refresh_token';
+
 
 // If the property defined by `refreshTokenProp` is an object:
 // -----------------------------------------------------------
@@ -97,19 +100,11 @@ refreshTokenName = 'token';
 // This allows the refresh token to be a further object deeper `{ "refreshTokenProp": { "refreshTokenRoot" : { "refreshTokenName" : '...' } } }`
 refreshTokenRoot = false;
 
-
-// Id Token Options
-// =====================
-
-// The property from which to get the id token after a successful login
+// The property name from which to get the user authentication token. Can also be dotted idTokenProp.idTokenName
 idTokenProp = 'id_token';
-
-// If the property defined by `idTokenProp` is an object:
-// -----------------------------------------------------------
-
-// This is the property from which to get the token `{ "idTokenProp": { "idTokenName" : '...' } }`
+// This is the property from which to get the id token `{ "idTokenProp": { "idTokenName" : '...' } }`
 idTokenName = 'token';
-// This allows the id token to be a further object deeper `{ "idTokenProp": { "idTokenRoot" : { "idTokenName" : '...' } } }`
+// This allows the id_token to be a further object deeper `{ "idTokenProp": { "idTokenRoot" : { "idTokenName" : '...' } } }`
 idTokenRoot = false;
 
 
