@@ -1355,7 +1355,7 @@ export class AuthService {
     // in case auto refresh tokens are enabled
     if (this.config.autoUpdateToken && this.authentication.getAccessToken() && this.authentication.getRefreshToken()) {
       // we just need to check the status of the updated token we have in storage
-      this.authentication.updateAuthenticated();
+      this.updateAuthenticated();
 
       return;
     }
