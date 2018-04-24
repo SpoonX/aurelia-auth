@@ -72,7 +72,7 @@
       "aurelia-bootstrapper": "^1.0.0",
       "aurelia-pal-browser": "^1.0.0",
       "aurelia-polyfills": "^1.0.0",
-      "fetch": "github:github/fetch@^1.0.0"
+      "whatwg-fetch": "^2.0.4"
     }
   },
   "dependencies": {

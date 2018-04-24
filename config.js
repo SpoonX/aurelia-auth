@@ -22,8 +22,8 @@ System.config({
     "aurelia-router": "npm:aurelia-router@1.0.6",
     "aurelia-templating-resources": "npm:aurelia-templating-resources@1.1.1",
     "extend": "npm:extend@3.0.0",
-    "fetch": "github:github/fetch@1.0.0",
     "jwt-decode": "npm:jwt-decode@2.1.0",
+    "whatwg-fetch": "npm:whatwg-fetch@2.0.4",
     "npm:aurelia-api@3.0.0": {
       "aurelia-dependency-injection": "npm:aurelia-dependency-injection@1.1.0",
       "aurelia-fetch-client": "npm:aurelia-fetch-client@1.0.1",
