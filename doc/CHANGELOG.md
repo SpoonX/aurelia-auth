@@ -1,3 +1,8 @@
+<a name="3.8.0"></a>
+# [3.8.0](https://github.com/spoonx/aurelia-authentication/compare/v3.7.1...v3.8.0) (2018-05-28)
+
+
+
 <a name="3.7.1"></a>
 ## [3.7.1](https://github.com/spoonx/aurelia-authentication/compare/v3.7.0...v3.7.1) (2018-05-05)
 
