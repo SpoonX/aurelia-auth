@@ -80,7 +80,9 @@ export class FetchConfig {
             request.headers.set(this.config.authHeader, token);
 
             return this.httpClient.fetch(request).then(resolve);
-          });
+          })
+          // reject if could not update the token
+          .catch(e => reject(e));
         });
       }
     };
