@@ -339,6 +339,30 @@ export class AuthService {
     return authenticated;
   }
 
+ /**
+  * Asynchronously gets authentication status from storage
+  *
+  * @returns {Promise<boolean>} For Non-JWT and unexpired JWT: true, else: false
+  */
+ isAuthenticatedAsync(): Promise<boolean> {
+    this.authentication.responseAnalyzed = false;
+
+    let authenticated = this.authentication.isAuthenticated();
+
+    // auto-update token?
+    if (!authenticated
+      && this.config.autoUpdateToken
+      && this.authentication.getAccessToken()
+      && this.authentication.getRefreshToken()
+    ) {
+      return this.updateToken()
+        .catch(error => logger.warn(error))
+        .then(() => this.authenticated);
+    }
+
+    return Promise.resolve(authenticated);
+  }
+
   /**
    * Gets exp in milliseconds
    *
