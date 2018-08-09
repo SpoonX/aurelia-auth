@@ -257,6 +257,29 @@ CAUTION: When you cancel or manually set the timeout, .isAuthenticated and .auth
 
 ----------
 
+### .isAuthenticatedAsync()
+
+Asynchronously checks if there is a (valid) token in storage. If the token is isExpired and  BaseConfig.autoUpdateToken===true, it resolves when a new access token automatically requested using the refesh_token.
+
+CAUTION: When you cancel or manually set the timeout, .isAuthenticatedAsync and .authenticated could yield different results.
+
+#### Returns
+
+`Promise.resolve(true)`, for Non-JWT and unexpired JWT, `Promise.resolve(false)` for no token or expired JWT
+
+#### Example
+
+```js
+  isAuthenticatedAsync() {
+    return this.authService.isAuthenticatedAsync().then(result => {
+      console.log("is authenticated=",result);
+      return result;
+    });
+  }
+```
+
+----------
+
 ### .getExp()
 
 Gets exp of the access token in milliseconds
