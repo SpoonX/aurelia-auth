@@ -312,13 +312,17 @@ export class AuthService {
       && this.authentication.getRefreshToken()
     ) {
       this.updateToken()
+        .catch(error => logger.warn(error))
         .then(() => {
           // call callback with now updated status
           if (typeof callback === 'function') {
-            callback(this.authenticated); // eslint-disable-line callback-return
+            try {
+              callback(this.authenticated); // eslint-disable-line callback-return
+            } catch (error) {
+              logger.warn(error.message);
+            }
           }
-        })
-        .catch(error => logger.warn(error.message));
+        });
 
       authenticated = true;
     } else if (typeof callback === 'function') {
