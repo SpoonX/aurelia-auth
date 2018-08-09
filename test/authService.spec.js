@@ -660,7 +660,7 @@ describe('AuthService', () => {
     });
 
     describe('even with autoUpdateToken=true', () => {
-      it('should return boolean false', () => {
+      it('should return boolean false', done => {
         authService.setResponseObject({token: 'some', refresh_token: 'another'});
 
         spyOn(authService, 'updateToken').and.returnValue(Promise.resolve(false));
