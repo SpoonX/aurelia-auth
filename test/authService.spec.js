@@ -569,6 +569,113 @@ describe('AuthService', () => {
     });
   });
 
+  describe('.isAuthenticatedAsync()', () => {
+    const container   = getContainer();
+    const authService = container.get(AuthService);
+
+    authService.config.client = {
+      post: () => new Promise(resolve => setTimeout(() => resolve({token: tokenPast.jwt}), 10))
+    };
+
+    beforeEach(() => {
+      authService.config.useRefreshToken = true;
+      authService.config.autoUpdateToken = true;
+    });
+    afterEach(done => {
+      authService.config.useRefreshToken = false;
+      authService.config.autoUpdateToken = false;
+      authService.logout().then(done);
+    });
+
+    it('should return boolean', done => {
+      authService.isAuthenticatedAsync()
+        .then(x => {
+          expect(typeof x).toBe('boolean');
+          done();
+        });
+    });
+
+    describe('should analyse token from storage each time', () => {
+      it('should be true after setResponseObject with token', done => {
+        authService.setResponseObject({token: 'some', refresh_token: 'another'});
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(true);
+            done();
+          });
+      });
+
+      it('should be false after clearing storage directly', done => {
+        authService.authentication.storage.remove(authService.config.storageKey);
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(false);
+            done();
+          });
+      });
+
+      it('should be true after setting storage directly', done => {
+        authService.authentication.storage.set(authService.config.storageKey, JSON.stringify({token: 'some', refresh_token: 'another'}));
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(true);
+            done();
+          });
+      });
+
+      it('should be false after setResponseObject with null', done => {
+        authService.setResponseObject(null);
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(false);
+            done();
+          });
+      });
+    });
+
+    describe('with real token', () => {
+      it('should return true', done => {
+        authService.setResponseObject({access_token: tokenFuture.jwt, refresh_token: tokenFuture.jwt});
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(true);
+            done();
+          });
+      });
+
+      it('should return false after refreshing', done => {
+        authService.setResponseObject({access_token: tokenPast.jwt, refresh_token: tokenFuture.jwt});
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(x).toBe(false);
+            done();
+          });
+      });
+    });
+
+    describe('even with autoUpdateToken=true', () => {
+      it('should return boolean false', () => {
+        authService.setResponseObject({token: 'some', refresh_token: 'another'});
+
+        spyOn(authService, 'updateToken').and.returnValue(Promise.resolve(false));
+        spyOn(authService.authentication, 'isAuthenticated').and.returnValue(false);
+
+        authService.isAuthenticatedAsync()
+          .then(x => {
+            expect(typeof x).toBe('boolean');
+            expect(x).toBe(false);
+            done();
+          });
+      });
+    });
+  });
+
   describe('.getTtl()', () => {
     const container   = getContainer();
     const authService = container.get(AuthService);
