@@ -1,3 +1,14 @@
+<a name="3.8.2"></a>
+## [3.8.2](https://github.com/spoonx/aurelia-authentication/compare/v3.8.1...v3.8.2) (2018-09-24)
+
+
+### Bug Fixes
+
+* **auth0:** extend responseType check ([2d3434b](https://github.com/spoonx/aurelia-authentication/commit/2d3434b)), closes [#403](https://github.com/spoonx/aurelia-authentication/issues/403)
+* **auth0:** fix access and id token assignments ([9e2c383](https://github.com/spoonx/aurelia-authentication/commit/9e2c383)), closes [#397](https://github.com/spoonx/aurelia-authentication/issues/397)
+
+
+
 <a name="3.8.1"></a>
 ## [3.8.1](https://github.com/spoonx/aurelia-authentication/compare/v3.8.0...v3.8.1) (2018-06-13)
 

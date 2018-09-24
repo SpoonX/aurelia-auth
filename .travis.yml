@@ -3,7 +3,7 @@ node_js:
 - '5.7.0'
 before_install:
 - npm install -g jspm
-- jspm config registries.github.auth U3Bvb25YOjY2NWIxYWQ2ZTM4ZjUxZGNjMzcwNDBkYzMxYjgxZGVkZjE1M2RjYjg=
+- jspm config registries.github.auth UldPdmVyZGlqazpiNmQxNWE5MmMwNGFiZGM5MDFhMjEwOTU0NjdkMjBiMGJhNzE0OTE3=
 before_script:
 - jspm -v
 - jspm i

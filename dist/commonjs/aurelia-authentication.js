@@ -629,7 +629,8 @@ var AuthLock = exports.AuthLock = (_dec2 = (0, _aureliaDependencyInjection.injec
           _this3.lock.hide();
         }
         resolve({
-          access_token: authResponse.idToken
+          access_token: authResponse.accessToken,
+          id_token: authResponse.idToken
         });
       });
       _this3.lock.on('unrecoverable_error', function (err) {
@@ -642,7 +643,7 @@ var AuthLock = exports.AuthLock = (_dec2 = (0, _aureliaDependencyInjection.injec
     });
 
     return openPopup.then(function (lockResponse) {
-      if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token') {
+      if (provider.responseType === 'token' || provider.responseType === 'id_token%20token' || provider.responseType === 'token%20id_token' || provider.responseType === 'token id_token') {
         return lockResponse;
       }
 

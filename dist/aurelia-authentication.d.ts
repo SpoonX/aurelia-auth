@@ -674,6 +674,16 @@ export declare class FetchConfig {
  *
  */
 export declare function configure(frameworkConfig: { container: Container, globalResources: (() => any) }, config: {} | Function): any;
+export declare class AuthFilterValueConverter {
+  
+  /**
+     * route toView predictator on route.config.auth === isAuthenticated
+     * @param  {RouteConfig}  routes            the routes array to convert
+     * @param  {boolean}      isAuthenticated   authentication status
+     * @return {boolean}      show/hide element
+     */
+  toView(routes: RouteConfig, isAuthenticated: boolean): boolean;
+}
 export declare class AuthenticatedFilterValueConverter {
   constructor(authService: AuthService);
   
@@ -693,14 +703,4 @@ export declare class AuthenticatedValueConverter {
      * @return {boolean}  show/hide element
      */
   toView(): any;
-}
-export declare class AuthFilterValueConverter {
-  
-  /**
-     * route toView predictator on route.config.auth === isAuthenticated
-     * @param  {RouteConfig}  routes            the routes array to convert
-     * @param  {boolean}      isAuthenticated   authentication status
-     * @return {boolean}      show/hide element
-     */
-  toView(routes: RouteConfig, isAuthenticated: boolean): boolean;
 }

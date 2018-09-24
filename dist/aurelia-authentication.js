@@ -698,7 +698,8 @@ export class AuthLock {
           this.lock.hide();
         }
         resolve({
-          access_token: authResponse.idToken
+          access_token: authResponse.accessToken,
+          id_token    : authResponse.idToken
         });
       });
       this.lock.on('unrecoverable_error', err => {
@@ -716,6 +717,7 @@ export class AuthLock {
         if (provider.responseType === 'token'
           || provider.responseType === 'id_token%20token'
           || provider.responseType === 'token%20id_token'
+          || provider.responseType === 'token id_token'
         ) {
           return lockResponse;
         }

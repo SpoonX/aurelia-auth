@@ -93,6 +93,7 @@ export class AuthLock {
         if (provider.responseType === 'token'
           || provider.responseType === 'id_token%20token'
           || provider.responseType === 'token%20id_token'
+          || provider.responseType === 'token id_token'
         ) {
           return lockResponse;
         }
